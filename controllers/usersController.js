@@ -39,9 +39,9 @@ mobileAuth = async (req, res) => {
 
   res.status(200).send({ message: "mobile number found" });
 
-  // handle sms otp verification if found or not found
+  // handle sms otp verification for found or not found cases
 
-  // if found and verified, send to generate token and send to dashboard
+  // if found and verified, generate token and send to dashboard
 
   // if not found and verified, send to signup...
 };
