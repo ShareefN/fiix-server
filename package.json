@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "NOVE_ENV=test",
     "start": "PORT=5050 NODE_ENV=development nodemon index.js"
   },
   "author": "Shareef\tN",
