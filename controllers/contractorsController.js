@@ -72,17 +72,19 @@ getContractor = async (req, res) => {
 };
 
 updatePassword = async (req, res) => {
-  const contractor = await contractors.findOne({ where: { id: req.params.id } });
+  const contractor = await contractors.findOne({
+    where: { id: req.params.id }
+  });
   if (!contractor)
     return res.status(404).send({ message: "Contractor not found" });
-  
+
   const validatePassword = await bcrypt.compare(
     req.body.password,
     contractor.password
   );
   if (!validatePassword)
     return res.status(400).send({ message: "Invalid password" });
-    
+
   const salt = await bcrypt.genSalt(10);
   req.body.newPassword = await bcrypt.hash(req.body.newPassword, salt);
 
@@ -95,6 +97,33 @@ updatePassword = async (req, res) => {
       res.status(200).send({ message: "Password successfully updated" })
     )
     .catch(err => res.status(500).send({ error: err.message }));
+};
+
+updateContractor = async (req, res) => {
+  const contractor = await contractors.findOne({
+    where: { id: req.params.id }
+  });
+  if (!contractor)
+    return res.status(404).send({ message: "Contractor not found" });
+
+  await contractors.update({
+    name: req.body.name === null ? contractor.name : req.body.name,
+    email: req.body.email === null ? contractor.email : req.body.email,
+    location:
+      req.body.location === null ? contractor.location : req.body.location,
+    timeIn: req.body.timeIn === null ? contractor.timeIn : req.body.timeIn,
+    timeOut: req.body.timeOut === null ? contractor.timeOut : req.body.timeOut,
+    profileImage:
+      req.body.profileImage === null
+        ? contractor.profileImage
+        : req.body.profileImage,
+    identity:
+      req.body.identity === null ? contractor.identity : req.body.identity,
+    nonCriminal:
+      req.body.nonCriminal === null
+        ? contractor.nonCriminal
+        : req.body.nonCriminal
+  }, { where: { id: req.params.id } });
 };
 
 module.exports = {
