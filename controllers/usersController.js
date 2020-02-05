@@ -1,4 +1,4 @@
-const { users } = require("../models");
+const { users, contractors } = require("../models");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const _ = require("lodash");
@@ -34,6 +34,10 @@ mobileAuth = async (req, res) => {
   if (error) return res.status(400).send({ error: error.message });
 
   const isFound = await users.findOne({ where: { number: req.body.number } });
+
+  if (isFound.dataValues.isProhibited == 1)
+    return res.status(403).send({ message: "Forbidden" });
+
   if (!isFound)
     return res.status(404).send({ error: "mobile number not found" });
 
@@ -53,6 +57,12 @@ signup = async (req, res) => {
   const isFound = await users.findOne({ where: { email: req.body.email } });
   if (isFound) return res.status(409).send({ message: "User already exists" });
 
+  const isContractor = await contractors.findOne({
+    where: { email: req.body.email }
+  });
+  if (isContractor)
+    return res.status(409).send({ message: "User already exists" });
+
   const salt = await bcrypt.genSalt(10);
   req.body.password = await bcrypt.hash(req.body.password, salt);
 
@@ -60,7 +70,7 @@ signup = async (req, res) => {
     .create(req.body)
     .then(async user => {
       const token = await generateAuthToken(user);
-      const result = await _.pick(user, ["username", "email", "number"]);
+      const result = await _.pick(user, ["id", "username", "email", "number"]);
 
       res
         .status(201)
@@ -80,6 +90,9 @@ login = async (req, res) => {
   if (!user)
     return res.status(404).send({ message: "Invalid email or password" });
 
+  if (user.dataValues.isProhibited == 1)
+    return res.status(403).send({ message: "Forbidden" });
+
   const validatePassword = await bcrypt.compare(
     req.body.password,
     user.password
@@ -88,7 +101,7 @@ login = async (req, res) => {
     return res.status(404).send({ message: "Invalid email or password" });
 
   const token = await generateAuthToken(user);
-  const result = await _.pick(user, ["username", "email", "number"]);
+  const result = await _.pick(user, ["id", "username", "email", "number"]);
 
   res
     .status(200)
@@ -133,12 +146,15 @@ updatePassword = async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   req.body.newPassword = await bcrypt.hash(req.body.newPassword, salt);
 
-  await users.update(
-    { password: req.body.newPassword },
-    { where: { id: req.params.id } }
-  );
-
-  res.status(200).send({ message: "Password successfully updated" });
+  await users
+    .update(
+      { password: req.body.newPassword },
+      { where: { id: req.params.id } }
+    )
+    .then(() =>
+      res.status(200).send({ message: "Password successfully updated" })
+    )
+    .catch(err => res.status(500).send({ error: err.message }));
 };
 
 resetPassword = async (req, res) => {
@@ -146,8 +162,8 @@ resetPassword = async (req, res) => {
 };
 
 deleteUser = async (rq, res) => {
-  // deactive user account and delete from database
-}
+  // add column if table => hasDeactivated
+};
 
 module.exports = {
   signup,
@@ -155,5 +171,5 @@ module.exports = {
   login,
   getUser,
   updateUser,
-  updatePassword
+  updatePassword,
 };
