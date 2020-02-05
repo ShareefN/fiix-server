@@ -52,6 +52,8 @@ module.exports = app => {
     contractors.updatePassword
   );
 
+  app.put('/contractor/update/:id', auth, contractors.updateContractor)
+
   // ADMIN ROUTES
   app.get("/api/contractors", authToken, admin.getContractors);
 

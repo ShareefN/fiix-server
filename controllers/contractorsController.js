@@ -129,5 +129,6 @@ updateContractor = async (req, res) => {
 module.exports = {
   login,
   getContractor,
-  updatePassword
+  updatePassword,
+  updateContractor
 };
