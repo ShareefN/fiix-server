@@ -7,7 +7,7 @@ authToken = async (req, res, next) => {
     return res
       .status(404)
       .send({ error: "No token provided"});
-
+      
   try {
     const decoded = await jwt.verify(
       validateToken,

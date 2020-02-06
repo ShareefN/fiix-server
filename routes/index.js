@@ -2,6 +2,7 @@ const logger = require("morgan");
 const bodyParser = require("body-parser");
 const { users, application, contractors, admin } = require("../controllers");
 const authToken = require("../middleware/authenticate");
+const superAdmin = require("../middleware/superAdmin")
 
 module.exports = app => {
   if (process.env.NODE_ENV === "development") {
@@ -59,7 +60,17 @@ module.exports = app => {
 
   app.get("/users", authToken, admin.getUsers);
 
-  app.put("/api/block/:id", authToken, admin.blockUser);
+  app.put("/api/block/:id", [authToken, superAdmin], admin.blockUser);
 
-  app.put("/api/unblock/:id", authToken, admin.unBlockUser);
+  app.put("/api/unblock/:id", [authToken, superAdmin], admin.unBlockUser);
+
+  app.put('/api/contractor/deactivate/:id', [authToken, superAdmin], admin.deactivateContractor);
+
+  app.put('/api/contractor/activate/:id', [authToken, superAdmin], admin.activateContractor);
+
+  app.post('/api/create/admin', [authToken, superAdmin], admin.createAdmin);
+
+  app.post('/api/login/admin', admin.login);
+
+  app.put('/api/update/password/admin/:id', authToken, admin.updateAdminPassword)
 };
