@@ -17,6 +17,9 @@ login = async (req, res) => {
   if (!contractor)
     return res.status(404).send({ message: "Invalid email or password" });
 
+  if (contractor.dataValues.isLost == 1)
+    return res.status(400).send({ message: "Contractor lost" });
+
   const validatePassword = await bcrypt.compare(
     req.body.password,
     contractor.password
@@ -106,24 +109,7 @@ updateContractor = async (req, res) => {
   if (!contractor)
     return res.status(404).send({ message: "Contractor not found" });
 
-  await contractors.update({
-    name: req.body.name === null ? contractor.name : req.body.name,
-    email: req.body.email === null ? contractor.email : req.body.email,
-    location:
-      req.body.location === null ? contractor.location : req.body.location,
-    timeIn: req.body.timeIn === null ? contractor.timeIn : req.body.timeIn,
-    timeOut: req.body.timeOut === null ? contractor.timeOut : req.body.timeOut,
-    profileImage:
-      req.body.profileImage === null
-        ? contractor.profileImage
-        : req.body.profileImage,
-    identity:
-      req.body.identity === null ? contractor.identity : req.body.identity,
-    nonCriminal:
-      req.body.nonCriminal === null
-        ? contractor.nonCriminal
-        : req.body.nonCriminal
-  }, { where: { id: req.params.id } });
+  await contractors.update(req.body, { where: { id: req.params.id } });
 };
 
 module.exports = {
