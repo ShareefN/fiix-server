@@ -121,13 +121,7 @@ updateUser = async (req, res) => {
   const user = await users.findOne({ where: { id: req.params.id } });
   if (!user) return res.status(404).send({ error: "User not found" });
 
-  await users.update(
-    {
-      username: req.body.username === null ? user.username : req.body.username,
-      email: req.body.email === null ? user.email : req.body.email
-    },
-    { where: { id: req.params.id } }
-  );
+  await users.update(req.body, { where: { id: req.params.id } });
 
   res.status(200).send({ message: "User successfully updated" });
 };
@@ -171,5 +165,5 @@ module.exports = {
   login,
   getUser,
   updateUser,
-  updatePassword,
+  updatePassword
 };
