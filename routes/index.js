@@ -73,4 +73,6 @@ module.exports = app => {
   app.post('/api/login/admin', admin.login);
 
   app.put('/api/update/password/admin/:id', authToken, admin.updateAdminPassword)
+
+  app.put('/api/deactivate/admin/:id', [authToken, superAdmin], admin.deactivateAdmin);
 };

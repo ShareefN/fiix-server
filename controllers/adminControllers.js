@@ -5,7 +5,9 @@ const config = require("config");
 const _ = require("lodash");
 
 generateAuthToken = admin => {
-  const token = jwt.sign({ admin }, config.get("jwtPrivateKey"));
+  const token = jwt.sign({ admin }, config.get("jwtPrivateKey"), {
+    expiresIn: 11589000
+  });
   return token;
 };
 
@@ -48,6 +50,9 @@ login = async (req, res) => {
   if (!admin)
     return res.status(404).send({ message: "Invalid email or password" });
 
+  if (admin.dataValues.isDeactivated === true)
+    return res.status(401).send({ message: "Account is deactivated" });
+
   const validatePassword = await bcrypt.compare(
     req.body.password,
     admin.password
@@ -72,8 +77,31 @@ updateAdminPassword = async (req, res) => {
   req.body.newPassword = await bcrypt.hash(req.body.newPassword, salt);
 
   await admins
-    .update({ password: req.body.newPassword }, { where: { id: req.params.id } })
+    .update(
+      { password: req.body.newPassword },
+      { where: { id: req.params.id } }
+    )
     .then(() => res.status(200).send({ message: "Password updated" }))
+    .catch(err => res.status(500).send({ error: err.message }));
+};
+
+// activateAdmin = async (req, res) => {
+//   const admin = await admins.findOne({where: {id: req.params.id}})
+//   if(!admin) return res.status(404).send({message: 'Admin not found'})
+
+//   if(admin.dataValues.isDeactivated === tre)
+// }
+
+deactivateAdmin = async (req, res) => {
+  const admin = await admins.findOne({ where: { id: req.params.id } });
+  if (!admin) return res.status(404).send({ message: "Admin not found" });
+
+  if (admin.dataValues.isDeactivated === 1)
+    return res.status(400).send({ message: "Admin already deactivated" });
+
+  await admins
+    .update({ isDeactivated: true }, { where: { id: req.params.id } })
+    .then(() => res.status(200).send({ message: "Admin deactivated" }))
     .catch(err => res.status(500).send({ error: err.message }));
 };
 
@@ -153,5 +181,6 @@ module.exports = {
   activateContractor,
   createAdmin,
   login,
-  updateAdminPassword
+  updateAdminPassword,
+  deactivateAdmin
 };
