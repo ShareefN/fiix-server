@@ -1,4 +1,4 @@
-const { contractors, users, admins } = require("../models");
+const { contractors, users, admins, application } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("config");
@@ -29,7 +29,6 @@ createAdmin = async (req, res) => {
   await admins
     .create(req.body)
     .then(async admin => {
-      const token = await generateAuthToken(admin);
       const result = await _.pick(admin, [
         "id",
         "name",
@@ -39,8 +38,7 @@ createAdmin = async (req, res) => {
 
       res
         .status(201)
-        .header("x-auth-token", token)
-        .send({ message: "success", result, token });
+        .send({ message: "success", result });
     })
     .catch(err => res.status(500).send({ error: err.message }));
 };
@@ -50,7 +48,7 @@ login = async (req, res) => {
   if (!admin)
     return res.status(404).send({ message: "Invalid email or password" });
 
-  if (admin.dataValues.isDeactivated === true)
+  if (admin.dataValues.isDeactivated == 1)
     return res.status(401).send({ message: "Account is deactivated" });
 
   const validatePassword = await bcrypt.compare(
@@ -108,6 +106,11 @@ deactivateAdmin = async (req, res) => {
 getContractors = async (req, res) => {
   const Contractors = await contractors.findAll();
   res.status(200).send(Contractors);
+};
+
+getApplications = async (req, res) => {
+  const Applications = await application.findAll();
+  res.status(200).send(Applications);
 };
 
 getUsers = async (req, res) => {
@@ -172,6 +175,77 @@ activateContractor = async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 };
 
+approveApplication = async (req, res) => {
+  const applicant = await application.findOne({ where: { id: req.params.id } });
+  if (!applicant)
+    return res.status(404).send({ error: "Application not found" });
+
+  await contractors
+    .create(applicant.dataValues)
+    .then(() => res.status(200))
+    .catch(error => res.status(500).send({ error: error.message }));
+
+  await application
+    .destroy({ where: { id: req.params.id } })
+    .then(() => res.status(200))
+    .catch(error => res.status(500).send({ error: error }));
+
+  await users
+    .destroy({ where: { email: applicant.email } })
+    .then(() => res.status(200))
+    .catch(error => res.status(500).send({ error: error }));
+
+  const result = _.pick(applicant, [
+    "name",
+    "email",
+    "number",
+    "location",
+    "timeIn",
+    "timeOut",
+    "category",
+    "subCategory",
+    "profileImage",
+    "identity",
+    "nonCriminal"
+  ]);
+
+  res.status(200).send({ message: "success", result });
+};
+
+rejectApplication = async (req, res) => {
+  const applicant = await application.findOne({ where: { id: req.params.id } });
+  if (!applicant)
+    return res.status(404).send({ error: "Application not found" });
+
+  await users
+    .update(
+      {
+        rejectedReason: req.body.rejectedReason,
+        isRejected: true,
+        hasApplied: false
+      },
+      { where: { email: applicant.email } }
+    )
+    .then(async () => {
+      await applicant
+        .destroy({ where: { id: req.params.id } })
+        .then(() => res.status(200).send({ message: "User rejected" }));
+    });
+};
+
+activateUser = async (req, res) => {
+  const user = await users.findOne({ where: { id: req.params.id } });
+  if (!user) return res.status(404).send({ message: "user not found" });
+
+  if (user.dataValues.isDeactivated == 0)
+    return res.status(400).send({ message: "user already active" });
+
+  await users
+    .update({ isDeactivated: false }, { where: { id: req.params.id } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
+};
+
 module.exports = {
   getContractors,
   getUsers,
@@ -182,5 +256,9 @@ module.exports = {
   createAdmin,
   login,
   updateAdminPassword,
-  deactivateAdmin
+  deactivateAdmin,
+  getApplications,
+  approveApplication,
+  rejectApplication,
+  activateUser
 };

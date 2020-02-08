@@ -112,6 +112,13 @@ updateContractor = async (req, res) => {
   await contractors.update(req.body, { where: { id: req.params.id } });
 };
 
+deactivateAccount = async (req, res) => {
+  const isFound = await contractors.findOne({where: {id: req.params.id}})
+  if(!isFound) return res.status(404).send({message: 'contractor not found'})
+
+  if(isFound.dataValues.isLost == 1) return res.status(400).send({message: 'Contractor already deactivated'})
+}
+
 module.exports = {
   login,
   getContractor,

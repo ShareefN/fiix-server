@@ -113,7 +113,13 @@ getUser = async (req, res) => {
   const user = await users.findOne({ where: { id: req.params.id } });
   if (!user) return res.status(404).send({ message: "User not found" });
 
-  const result = await _.pick(user, ["username", "email", "number"]);
+  const result = await _.pick(user, [
+    "id",
+    "username",
+    "email",
+    "number",
+    "hasApplied"
+  ]);
   res.status(200).send(result);
 };
 
@@ -155,8 +161,15 @@ resetPassword = async (req, res) => {
   // send email to user with input to enter new password
 };
 
-deleteUser = async (rq, res) => {
-  // add column if table => hasDeactivated
+deactivateAccount = async (req, res) => {
+  const isFound = await users.findOne({where: {id: req.params.id}})
+  if(!isFound) return res.status(404).send({message: 'User not found'})
+
+  if(isFound.isDeactivated == 1) return res.status(400).send({message: 'User already deactivated'})
+
+  await users.update({isDeactivated: true}, {where: {id: req.params.id}})
+  .then(() => res.status(200).send({message: 'success'}))
+  .catch(err => res.status(500).send({error: err.message}))
 };
 
 module.exports = {
@@ -165,5 +178,6 @@ module.exports = {
   login,
   getUser,
   updateUser,
-  updatePassword
+  updatePassword,
+  deactivateAccount
 };

@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     location: DataTypes.STRING,
     timeIn: DataTypes.STRING,
     timeOut: DataTypes.STRING,
+    category: DataTypes.STRING,
     profileImage: DataTypes.STRING,
     identity: DataTypes.STRING,
     nonCriminal: DataTypes.STRING,

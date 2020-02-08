@@ -1,5 +1,6 @@
 superAdmin = (req, res, next) => {
-  if(req.user.admin.isSuperAdmin == false)
+  console.log(req.user.admin.isSuperAdmin)
+  if(req.user.admin.isSuperAdmin != true)
   return res.status(403).send({message: 'Access Denied.'})
   next()
 }

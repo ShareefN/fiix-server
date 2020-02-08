@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     hasApplied: DataTypes.STRING,
     isRejected: DataTypes.STRING,
     isProhibited: DataTypes.STRING,
+    isDeactivated: DataTypes.STRING,
     rejectedReason: DataTypes.STRING,
     prohibitedReason: DataTypes.STRING
   }, {});
