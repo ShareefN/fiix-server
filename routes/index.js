@@ -1,7 +1,6 @@
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const { users, admins, application } = require("../controllers");
-const authToken = require("../middleware/authenticate");
 
 module.exports = app => {
   if (process.env.NODE_ENV === "development") {
