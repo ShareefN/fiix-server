@@ -6,7 +6,13 @@ const config = require("config");
 const authToken = require("../middleware/authenticate");
 const superAdmin = require("../middleware/superAdmin");
 const _ = require("lodash");
-const { contractors, users, admins, application } = require("../models");
+const {
+  contractors,
+  users,
+  admins,
+  application,
+  reports
+} = require("../models");
 
 generateAuthToken = admin => {
   const token = jwt.sign({ admin }, config.get("jwtPrivateKey"), {
@@ -344,26 +350,40 @@ router.put("/update/admin/password/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put('/deactivate/admin/:id', [authToken], async (req, res) => {
-  const admin = await admins.findOne({where: {id: req.params.id}})
-  if(!admin) return res.status(404).send({message: 'Not found'})
+router.put("/deactivate/admin/:id", [authToken], async (req, res) => {
+  const admin = await admins.findOne({ where: { id: req.params.id } });
+  if (!admin) return res.status(404).send({ message: "Not found" });
 
-  if(admin.dataValues.isDeactivated == 1) return res.status(400).send({message: 'Admin already deactived'})
-  
-  await admins.update({isDeactivated: true}, {where: {id: req.params.id}})
-  .then(() => res.status(200).send({message: 'success'}))
-  .catch(err => res.status(500).send({error: err.message}))
-})
+  if (admin.dataValues.isDeactivated == 1)
+    return res.status(400).send({ message: "Admin already deactived" });
 
-router.put('/activate/admin/:id', [authToken], async (req, res) => {
-  const admin = await admins.findOne({where: {id: req.params.id}})
-  if(!admin) return res.status(404).send({message: 'Not found'})
+  await admins
+    .update({ isDeactivated: true }, { where: { id: req.params.id } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
+});
 
-  if(admin.dataValues.isDeactivated == false) return res.status(400).send({message: 'Admin already active'})
+router.put("/activate/admin/:id", [authToken], async (req, res) => {
+  const admin = await admins.findOne({ where: { id: req.params.id } });
+  if (!admin) return res.status(404).send({ message: "Not found" });
 
-  await admins.update({isDeactivated: false}, {where: {id: req.params.id}})
-  .then(() => res.status(200).send({message: 'success'}))
-  .catch(err => res.status(500).send({error: err.message}))
-})
+  if (admin.dataValues.isDeactivated == false)
+    return res.status(400).send({ message: "Admin already active" });
+
+  await admins
+    .update({ isDeactivated: false }, { where: { id: req.params.id } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
+});
+
+router.put("/handle/report/:id", [authToken], async (req, res) => {
+  const isFound = await reports.findOne({ where: { id: req.params.id } });
+  if (!isFound) return res.status(404).send({ message: "Not found" });
+
+  await reports
+    .update({ notes: req.body.note }, { where: { id: req.params.id } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
+});
 
 module.exports = router;
