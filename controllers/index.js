@@ -1,5 +1,5 @@
 const users = require('./userController');
-const contractors = require("./contractorsController");
+const contractors = require("./contractorController");
 const application = require('./applicationController');
 const admins = require('./adminController')
 
