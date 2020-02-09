@@ -1,11 +1,11 @@
-const users = require("./usersController");
+const users = require('./userController');
 const contractors = require("./contractorsController");
 const application = require('./applicationController');
-const admin = require('./adminControllers')
+const admins = require('./adminController')
 
 module.exports = {
   users,
   contractors,
   application,
-  admin
+  admins
 };

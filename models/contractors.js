@@ -14,6 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     nonCriminal: DataTypes.STRING,
     rating: DataTypes.STRING,
     isLost: DataTypes.STRING,
+    isProhibited: DataTypes.STRING,
+    prohibitedReason: DataTypes.STRING,
   }, {});
   contractors.associate = function(models) {
     // associations can be defined here
