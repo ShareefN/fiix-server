@@ -1,8 +1,10 @@
-const { application, users, contractors } = require("../models");
+const express = require('express');
+const router = express.Router();
 const _ = require("lodash");
+const { contractors, users, application } = require("../models");
 
-applicationFunnel = async (req, res) => {
-  const user = await users.findOne({ where: { id: req.params.id } });
+router.post('/apply/:id', [authToken], async (req, res) => {
+    const user = await users.findOne({ where: { id: req.params.id } });
   if (!user) return res.status(404).send({ message: "User not found" });
 
   if (user.dataValues.isDeactivated == 1)
@@ -49,8 +51,6 @@ applicationFunnel = async (req, res) => {
         .catch(error => res.status(500).send({ error: error }));
     })
     .catch(error => res.status(500).send({ error: error }));
-};
+})
 
-module.exports = {
-  applicationFunnel
-};
+module.exports = router;
