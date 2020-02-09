@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const authToken = require("../middleware/authenticate");
 const _ = require("lodash");
-const { contractors, users } = require("../models");
+const { contractors } = require("../models");
 
 generateAuthToken = admin => {
   const token = jwt.sign({ admin }, config.get("jwtPrivateKey"));
@@ -21,7 +21,7 @@ router.post("/contractor/login", async (req, res) => {
     return res.status(404).send({ message: "Invalid email or password" });
 
   if (contractor.dataValues.isLost == 1)
-    return res.status(400).send({ message: "Contractor lost" });
+    return res.status(400).send({ message: "Contractor deactivated" });
 
   const validatePassword = await bcrypt.compare(
     req.body.password,
@@ -52,7 +52,7 @@ router.post("/contractor/login", async (req, res) => {
     .send({ message: "success", result, token });
 });
 
-router.get('/contractor/:id', [authToken], async (req, res) => {
+router.get("/contractor/:id", [authToken], async (req, res) => {
   const contractor = await contractors.findOne({
     where: { id: req.params.id }
   });
@@ -75,9 +75,9 @@ router.get('/contractor/:id', [authToken], async (req, res) => {
   ]);
 
   res.status(200).send(result);
-})
+});
 
-router.put('/contractor/update/password/:id', [authToken], async (req, res) => {
+router.put("/contractor/update/password/:id", [authToken], async (req, res) => {
   const contractor = await contractors.findOne({
     where: { id: req.params.id }
   });
@@ -104,6 +104,32 @@ router.put('/contractor/update/password/:id', [authToken], async (req, res) => {
       res.status(200).send({ message: "Password successfully updated" })
     )
     .catch(err => res.status(500).send({ error: err.message }));
+});
+
+router.put("/update/contractor/:id", [authToken], async (req, res) => {
+  const contractor = await contractors.findOne({
+    where: { id: req.params.id }
+  });
+
+  if (!contractor)
+    return res.status(404).send({ message: "Contractor not found" });
+
+  await contractors.update(req.body, { where: { id: req.params.id } })
+  .then(() => res.status(200).send({message: 'success'}))
+  .catch(err => res.status(500).send({error: err.message}))
+});
+
+router.put('/deactivate/contractor/:id', [authToken], async (req, res) => {
+  const isFound = await contractors.findOne({ where: { id: req.params.id } });
+  if (!isFound)
+    return res.status(404).send({ message: "contractor not found" });
+
+  if (isFound.dataValues.isLost == 1)
+    return res.status(400).send({ message: "Contractor already deactivated" });
+
+    await contractors.update({isLost: true}, {where: {id: req.params.id}})
+    .then(() => res.status(200).send({message: 'success'}))
+    .catch(err => res.status(500).send({error: err.message}))
 })
 
 module.exports = router;
