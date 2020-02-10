@@ -15,11 +15,14 @@ generateAuthToken = admin => {
 router.post("/user/mobile", async (req, res) => {
   const isFound = await users.findOne({ where: { number: req.body.number } });
 
-  if (isFound.dataValues.isProhibited == 1)
-    return res.status(403).send({ message: "Forbidden" });
-
   if (!isFound)
     return res.status(404).send({ error: "mobile number not found" });
+
+  if (isFound.dataValues.status !== "active")
+    return res.status(403).send({
+      message: `User account ${isFound.dataValue.status}`,
+      notes: isFound.dataValues.notes
+    });
 
   res.status(200).send({ message: "mobile number found" });
 
@@ -38,7 +41,7 @@ router.post("/user/register", async (req, res) => {
     where: { email: req.body.email }
   });
   if (isContractor)
-    return res.status(409).send({ message: "User already exists" });
+    return res.status(409).send({ message: "Contractor already exists" });
 
   const salt = await bcrypt.genSalt(10);
   req.body.password = await bcrypt.hash(req.body.password, salt);
@@ -47,7 +50,13 @@ router.post("/user/register", async (req, res) => {
     .create(req.body)
     .then(async user => {
       const token = await generateAuthToken(user);
-      const User = await _.pick(user, ["id", "username", "email", "number"]);
+      const User = await _.pick(user, [
+        "id",
+        "username",
+        "email",
+        "number",
+        "status"
+      ]);
 
       res
         .status(201)
@@ -64,11 +73,10 @@ router.post("/user/login", async (req, res) => {
   if (!user)
     return res.status(404).send({ message: "Invalid email or password" });
 
-  if (user.dataValues.isProhibited == 1)
-    return res.status(403).send({ message: "Forbidden" });
-
-  if (user.dataValues.isDeactivated == 1)
-    return res.status(401).send({ message: "Account deactivated" });
+  if (user.dataValues.status !== "active")
+    return res
+      .status(403)
+      .send({ message: `User account is ${user.dataValues.status}` });
 
   const validatePassword = await bcrypt.compare(
     req.body.password,
@@ -78,12 +86,18 @@ router.post("/user/login", async (req, res) => {
     return res.status(404).send({ message: "Invalid email or password" });
 
   const token = await generateAuthToken(user);
-  const result = await _.pick(user, ["id", "username", "email", "number"]);
+  const User = await _.pick(user, [
+    "id",
+    "username",
+    "email",
+    "number",
+    "status"
+  ]);
 
   res
     .status(200)
     .header("x-auth-token", token)
-    .send({ message: "success", result, token });
+    .send({ message: "success", User, token });
 });
 
 router.get("/user/:id", [authToken], async (req, res) => {
@@ -95,7 +109,10 @@ router.get("/user/:id", [authToken], async (req, res) => {
     "username",
     "email",
     "number",
-    "hasApplied"
+    "status",
+    "notes",
+    "createdAt",
+    "updatedAt"
   ]);
   res.status(200).send(result);
 });
@@ -138,11 +155,13 @@ router.put("/deactivate/user/:id", [authToken], async (req, res) => {
   const isFound = await users.findOne({ where: { id: req.params.id } });
   if (!isFound) return res.status(404).send({ message: "User not found" });
 
-  if (isFound.isDeactivated == 1)
-    return res.status(400).send({ message: "User already deactivated" });
+  if (isFound.dataValues.status !== "active")
+    return res
+      .status(400)
+      .send({ message: `User account already ${isFound.dataValues.status}` });
 
   await users
-    .update({ isDeactivated: true }, { where: { id: req.params.id } })
+    .update({ status: "deactivated" }, { where: { id: req.params.id } })
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
