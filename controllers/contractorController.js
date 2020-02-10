@@ -20,8 +20,13 @@ router.post("/contractor/login", async (req, res) => {
   if (!contractor)
     return res.status(404).send({ message: "Invalid email or password" });
 
-  if (contractor.dataValues.isLost == 1)
-    return res.status(400).send({ message: "Contractor deactivated" });
+  if (contractor.dataValues.status !== "active")
+    return res
+      .status(400)
+      .send({
+        message: `Contractor account ${contractor.dataValues.status}`,
+        notes: contractor.dataValues.notes
+      });
 
   const validatePassword = await bcrypt.compare(
     req.body.password,
@@ -32,7 +37,7 @@ router.post("/contractor/login", async (req, res) => {
     return res.status(404).send({ message: "Invalid email or password" });
 
   const token = await generateAuthToken(contractor);
-  const result = await _.pick(contractor, [
+  const Contractor = await _.pick(contractor, [
     "id",
     "name",
     "number",
@@ -43,13 +48,14 @@ router.post("/contractor/login", async (req, res) => {
     "profileImage",
     "identity",
     "nonCriminal",
-    "rating"
+    "rating",
+    "status"
   ]);
 
   res
     .status(200)
     .header("x-auth-token", token)
-    .send({ message: "success", result, token });
+    .send({ message: "success", nextStep: "dashboard", Contractor, token });
 });
 
 router.get("/contractor/:id", [authToken], async (req, res) => {
@@ -63,15 +69,18 @@ router.get("/contractor/:id", [authToken], async (req, res) => {
   const result = await _.pick(contractor, [
     "id",
     "name",
-    "number",
     "email",
-    "location",
-    "timeIn",
-    "timeOut",
-    "profileImage",
-    "identity",
-    "nonCriminal",
-    "rating"
+    "number",
+    "hasApplied",
+    "isRejected",
+    "isProhibited",
+    "isDeactivated",
+    "rejectedReason",
+    "prohibitedReason",
+    "createdAt",
+    "updatedAt",
+    "status",
+    "notes"
   ]);
 
   res.status(200).send(result);
@@ -114,22 +123,26 @@ router.put("/update/contractor/:id", [authToken], async (req, res) => {
   if (!contractor)
     return res.status(404).send({ message: "Contractor not found" });
 
-  await contractors.update(req.body, { where: { id: req.params.id } })
-  .then(() => res.status(200).send({message: 'success'}))
-  .catch(err => res.status(500).send({error: err.message}))
+  await contractors
+    .update(req.body, { where: { id: req.params.id } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put('/deactivate/contractor/:id', [authToken], async (req, res) => {
+router.put("/deactivate/contractor/:id", [authToken], async (req, res) => {
   const isFound = await contractors.findOne({ where: { id: req.params.id } });
   if (!isFound)
     return res.status(404).send({ message: "contractor not found" });
 
-  if (isFound.dataValues.isLost == 1)
-    return res.status(400).send({ message: "Contractor already deactivated" });
+  if (isFound.dataValues.status !== "active")
+    return res
+      .status(400)
+      .send({ message: `Contractor account ${isFound.dataValues.status}` });
 
-    await contractors.update({isLost: true}, {where: {id: req.params.id}})
-    .then(() => res.status(200).send({message: 'success'}))
-    .catch(err => res.status(500).send({error: err.message}))
-})
+  await contractors
+    .update({ status: "deactivated" }, { where: { id: req.params.id } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
+});
 
 module.exports = router;
