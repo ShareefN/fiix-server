@@ -238,7 +238,7 @@ router.put("/prohibit/user/:id", [authToken], async (req, res) => {
       { isProhibited: true, prohibitedReason: req.body.prohibitedReason },
       { where: { id: req.params.id } }
     )
-    .then(() => res.status(200).send({ message: "User deactivated" }))
+    .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
@@ -269,7 +269,7 @@ router.put("/activate/user/:id", [authToken], async (req, res) => {
 
   await users
     .update({ isDeactivated: false }, { where: { id: req.params.id } })
-    .then(() => res.status(200).send({ message: "Account activated" }))
+    .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
@@ -290,7 +290,7 @@ router.put("/prohibit/contractor/:id", [authToken], async (req, res) => {
       { isProhibited: true, prohibitedReason: req.body.prohibitedReason },
       { where: { id: req.params.id } }
     )
-    .then(() => res.status(200).send({ message: "Contractor prohibited" }))
+    .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
@@ -308,7 +308,7 @@ router.put("/unprohibit/contractor/:id", [authToken], async (req, res) => {
       { isProhibited: false, prohibitedReason: null },
       { where: { id: req.params.id } }
     )
-    .then(() => res.status(200).send({ message: "Contractor is activated" }))
+    .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
@@ -346,7 +346,7 @@ router.put("/update/admin/password/:id", [authToken], async (req, res) => {
       { password: req.body.newPassword },
       { where: { id: req.params.id } }
     )
-    .then(() => res.status(200).send({ message: "Password updated" }))
+    .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
 

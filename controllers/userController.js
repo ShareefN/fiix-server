@@ -47,12 +47,12 @@ router.post("/user/register", async (req, res) => {
     .create(req.body)
     .then(async user => {
       const token = await generateAuthToken(user);
-      const result = await _.pick(user, ["id", "username", "email", "number"]);
+      const User = await _.pick(user, ["id", "username", "email", "number"]);
 
       res
         .status(201)
         .header("x-auth-token", token)
-        .send({ message: "success", result, token });
+        .send({ message: "success", User, token });
     })
     .catch(error => {
       res.status(500).send({ error: error.message });
