@@ -5,18 +5,23 @@ const { contractors, users, application } = require("../models");
 
 router.post("/apply/:id", [authToken], async (req, res) => {
   const user = await users.findOne({ where: { id: req.params.id } });
-  if (!user) return res.status(404).send({ message: "User not found" });
+  if (!user) return res.status(404).send({ message: "Not found" });
 
-  if (user.dataValues.isDeactivated == 1)
-    return res.status(400).send({ message: "User account is deactivated" });
-
-  if (user.dataValues.hasApplied == 1)
-    return res.status(302).send({ message: "Application already sent" });
-
-  if (user.dataValues.isRejected == 1)
+  if (user.status !== "active")
     return res
-      .status(403)
-      .send({ message: "User applied and rejected already" });
+      .status(400)
+      .send({
+        message: `User account already ${user.status}`,
+        status: user.status,
+        notes: user.notes
+      });
+
+  if (user.applicationStatus !== null)
+    return res.status(400).send({
+      message: `User ${user.applicationStatus}`,
+      status: user.status,
+      notes: user.notes
+    });
 
   const isFoundContractor = await contractors.findOne({
     where: { name: `${req.body.firstName} ${req.body.lastName}` }
@@ -46,7 +51,10 @@ router.post("/apply/:id", [authToken], async (req, res) => {
     .create(contractor)
     .then(async response => {
       await users
-        .update({ hasApplied: true }, { where: { id: req.params.id } })
+        .update(
+          { applicationStatus: "applied" },
+          { where: { id: req.params.id } }
+        )
         .then(response =>
           res.status(200).send({ message: "success", contractor })
         )

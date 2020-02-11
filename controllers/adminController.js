@@ -31,7 +31,10 @@ router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
   if (isContractor)
     return res
       .status(302)
-      .send({ message: "Email already registered as contractor" });
+      .send({
+        message: "Email already registered as contractor",
+        contractor: isContractor
+      });
 
   const salt = await bcrypt.genSalt(10);
   req.body.password = await bcrypt.hash(req.body.password, salt);
@@ -59,10 +62,10 @@ router.post("/auth/login", async (req, res) => {
   if (!admin)
     return res.status(404).send({ message: "Invalid email or password" });
 
-  if (admin.dataValues.status !== "active")
+  if (admin.status !== "active")
     return res
       .status(403)
-      .send({ message: `Admin account ${admin.dataValues.status}` });
+      .send({ message: `Admin account ${admin.status}` });
 
   const validatePassword = await bcrypt.compare(
     req.body.password,
@@ -92,7 +95,7 @@ router.post("/approve/application/:id", [authToken], async (req, res) => {
     return res.status(404).send({ error: "Application not found" });
 
   await contractors
-    .create(applicant.dataValues)
+    .create(applicant)
     .then(() => res.status(200))
     .catch(error => res.status(500).send({ error: error.message }));
 
@@ -132,6 +135,7 @@ router.post("/reject/application/:id", [authToken], async (req, res) => {
   await users
     .update(
       {
+        applicationStatus: "rejected",
         notes: req.body.rejectedReason
       },
       { where: { email: applicant.email } }
@@ -184,15 +188,15 @@ router.put("/prohibit/user/:id", [authToken], async (req, res) => {
   const User = await users.findOne({ where: { id: req.params.id } });
   if (!User) return res.status(404).send({ message: "Not found" });
 
-  if (User.dataValues.status !== 'active')
+  if (User.status !== "active")
     return res.status(400).send({
-      message: `User already ${User.dataValues.status}`,
-      notes: User.dataValues.notes
+      message: `User already ${User.status}`,
+      notes: User.notes
     });
 
   await users
     .update(
-      { status: 'prohibited', notes: req.body.prohibitedReason },
+      { status: "prohibited", notes: req.body.prohibitedReason },
       { where: { id: req.params.id } }
     )
     .then(() => res.status(200).send({ message: "success" }))
@@ -203,11 +207,11 @@ router.put("/activate/user/:id", [authToken], async (req, res) => {
   const User = await users.findOne({ where: { id: req.params.id } });
   if (!User) return res.status(404).send({ message: "Not found" });
 
-  if (User.dataValues.status == 'active')
+  if (User.status == "active")
     return res.status(400).send({ message: "Account already active" });
 
   await users
-    .update({ status: 'active' }, { where: { id: req.params.id } })
+    .update({ status: "active" }, { where: { id: req.params.id } })
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
@@ -218,10 +222,10 @@ router.put("/prohibit/contractor/:id", [authToken], async (req, res) => {
   });
   if (!Contractor) return res.status(404).send({ message: "Not found" });
 
-  if (Contractor.dataValues.status !== "active")
+  if (Contractor.status !== "active")
     return res.status(400).send({
-      message: `Contractor account already ${Contractor.dataValues.status}`,
-      notes: Contractor.dataValues.notes
+      message: `Contractor account already ${Contractor.status}`,
+      notes: Contractor.notes
     });
 
   await contractors
@@ -239,7 +243,7 @@ router.put("/activate/contractor/:id", [authToken], async (req, res) => {
   });
   if (!Contractor) return res.status(404).send({ message: "Not found" });
 
-  if (Contractor.dataValues.status == "active")
+  if (Contractor.status == "active")
     return res.status(400).send({ message: "Contractor already active" });
 
   await contractors
@@ -275,10 +279,10 @@ router.put("/deactivate/admin/:id", [authToken], async (req, res) => {
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send({ message: "Not found" });
 
-  if (admin.dataValues.status !== "active")
+  if (admin.status !== "active")
     return res
       .status(400)
-      .send({ message: `Admin already ${admin.dataValues.status}` });
+      .send({ message: `Admin already ${admin.status}` });
 
   await admins
     .update({ status: "deactivated" }, { where: { id: req.params.id } })
@@ -290,10 +294,10 @@ router.put("/prohibit/admin/:id", [authToken], async (req, res) => {
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send({ message: "Not found" });
 
-  if (admin.dataValues.status !== "active")
+  if (admin.status !== "active")
     return res
       .status(400)
-      .send({ message: `Admin already ${admin.dataValues.status}` });
+      .send({ message: `Admin already ${admin.status}` });
 
   await admins
     .update({ status: "prohibited" }, { where: { id: req.params.id } })
@@ -305,7 +309,7 @@ router.put("/activate/admin/:id", [authToken], async (req, res) => {
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send({ message: "Not found" });
 
-  if (admin.dataValues.status == "active")
+  if (admin.status == "active")
     return res.status(400).send({ message: "Admin already active" });
 
   await admins

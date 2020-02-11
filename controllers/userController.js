@@ -18,10 +18,10 @@ router.post("/user/mobile", async (req, res) => {
   if (!isFound)
     return res.status(404).send({ error: "mobile number not found" });
 
-  if (isFound.dataValues.status !== "active")
+  if (isFound.status !== "active")
     return res.status(403).send({
       message: `User account ${isFound.dataValue.status}`,
-      notes: isFound.dataValues.notes
+      notes: isFound.notes
     });
 
   res.status(200).send({ message: "mobile number found" });
@@ -73,10 +73,10 @@ router.post("/user/login", async (req, res) => {
   if (!user)
     return res.status(404).send({ message: "Invalid email or password" });
 
-  if (user.dataValues.status !== "active")
+  if (user.status !== "active")
     return res
       .status(403)
-      .send({ message: `User account is ${user.dataValues.status}` });
+      .send({ message: `User account is ${user.status}` });
 
   const validatePassword = await bcrypt.compare(
     req.body.password,
@@ -155,10 +155,10 @@ router.put("/deactivate/user/:id", [authToken], async (req, res) => {
   const isFound = await users.findOne({ where: { id: req.params.id } });
   if (!isFound) return res.status(404).send({ message: "User not found" });
 
-  if (isFound.dataValues.status !== "active")
+  if (isFound.status !== "active")
     return res
       .status(400)
-      .send({ message: `User account already ${isFound.dataValues.status}` });
+      .send({ message: `User account already ${isFound.status}` });
 
   await users
     .update({ status: "deactivated" }, { where: { id: req.params.id } })
