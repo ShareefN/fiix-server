@@ -9,7 +9,7 @@ router.post("/apply/:id", [authToken], async (req, res) => {
 
   if (user.status !== "active")
     return res
-      .status(400)
+      .status(403)
       .send({
         message: `User account already ${user.status}`,
         status: user.status,
@@ -17,7 +17,7 @@ router.post("/apply/:id", [authToken], async (req, res) => {
       });
 
   if (user.applicationStatus !== null)
-    return res.status(400).send({
+    return res.status(403).send({
       message: `User ${user.applicationStatus}`,
       status: user.status,
       notes: user.notes
