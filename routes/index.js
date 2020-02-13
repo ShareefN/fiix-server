@@ -1,6 +1,13 @@
 const logger = require("morgan");
 const bodyParser = require("body-parser");
-const { users, admins, application, contractors, report } = require("../controllers");
+const {
+  users,
+  admins,
+  application,
+  contractors,
+  report,
+  categories
+} = require("../controllers");
 
 module.exports = app => {
   if (process.env.NODE_ENV === "development") {
@@ -24,8 +31,11 @@ module.exports = app => {
   app.use("/application", application);
 
   // CONTRACTORS ROUTES
-  app.use('/auth', contractors)
+  app.use("/auth", contractors);
 
   // REPORT ROUTES
-  app.use('/send', report)
+  app.use("/send", report);
+
+  // CATEGORIES ROUTES
+  app.use("/categories", categories);
 };
