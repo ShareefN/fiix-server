@@ -9,6 +9,7 @@ router.post("/add/review/user/:id", [authToken], async (req, res) => {
   if (!user) return res.status(404).send({ message: "Not found" });
 
   const review = {
+    userId: user.id,
     username: user.username,
     number: user.number,
     review: req.body.review,
@@ -33,7 +34,7 @@ router.put(
     const user = await users.findOne({ where: { id: req.params.id } });
     if (!user) return res.status(404).send({ message: "User not found" });
 
-    if (review.number !== user.number)
+    if (review.userId !== user.id)
       res.status(403).send({
         message: "Action deined"
       });
@@ -57,7 +58,7 @@ router.delete(
     const user = await users.findOne({ where: { id: req.params.id } });
     if (!user) return res.status(404).send({ message: "User not found" });
 
-    if (review.number !== user.number)
+    if (review.userId !== user.id)
       res.status(403).send({
         message: "Action deined"
       });
@@ -77,14 +78,20 @@ router.put("/like/review/:reviewId/:userId", [authToken], async (req, res) => {
   if (!user) return res.status(404).send({ message: "User not found" });
 
   const likeCount = review.likes;
+  if (review.userIds == null) {
+    const idArr = [];
+    idArr.push(req.params.userId);
 
-  if(review.userIds == 0){
-    const like = {
-      likes: likeCount,
-      userIds: JSON.stringify([req.params.userId])
-    }
-    
+    return reviews
+      .update(
+        { likes: likeCount++, userIds: JSON.stringify(isArr) },
+        { where: { id: req.params.reviewId } }
+      )
+      .then(() => res.status(200).send({ message: "succes" }))
+      .catch(err => res.status(500).send({ error: err.message }));
   }
+
+  console.log(JSON.stringify([req.params.userId]));
 });
 
 module.exports = router;
