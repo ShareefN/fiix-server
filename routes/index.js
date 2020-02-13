@@ -6,7 +6,8 @@ const {
   application,
   contractors,
   report,
-  categories
+  categories,
+  review
 } = require("../controllers");
 
 module.exports = app => {
@@ -38,4 +39,6 @@ module.exports = app => {
 
   // CATEGORIES ROUTES
   app.use("/categories", categories);
+
+  app.use('/reviews', review)
 };

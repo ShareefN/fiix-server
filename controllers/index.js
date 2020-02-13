@@ -4,6 +4,7 @@ const application = require('./applicationController');
 const admins = require('./adminController');
 const report = require('./reportController');
 const categories = require('./categoryController');
+const review = require('./reviewController');
 
 module.exports = {
   users,
@@ -11,5 +12,6 @@ module.exports = {
   application,
   admins,
   report,
-  categories
+  categories,
+  review
 };
