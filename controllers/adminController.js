@@ -256,7 +256,7 @@ router.put("/prohibit/contractor/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put("/activate/contractor/:id", [authToken], async (req, res) => {
+router.put("/activate/contractor/:id", [authToken, superAdmin], async (req, res) => {
   const Contractor = await contractors.findOne({
     where: { id: req.params.id }
   });
@@ -294,7 +294,7 @@ router.put("/update/admin/password/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put("/deactivate/admin/:id", [authToken], async (req, res) => {
+router.put("/deactivate/admin/:id", [authToken, superAdmin], async (req, res) => {
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send({ message: "Not found" });
 
@@ -307,12 +307,12 @@ router.put("/deactivate/admin/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put("/prohibit/admin/:id", [authToken], async (req, res) => {
+router.put("/prohibit/admin/:id", [authToken, superAdmin], async (req, res) => {
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send({ message: "Not found" });
 
   if (admin.status !== "active")
-    return res.status(400).send({ message: `Admin already ${admin.status}` });
+    return res.status(400).send({ message: `Admin account already ${admin.status}` });
 
   await admins
     .update({ status: "prohibited" }, { where: { id: req.params.id } })
@@ -320,7 +320,7 @@ router.put("/prohibit/admin/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put("/activate/admin/:id", [authToken], async (req, res) => {
+router.put("/activate/admin/:id", [authToken, superAdmin], async (req, res) => {
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send({ message: "Not found" });
 
