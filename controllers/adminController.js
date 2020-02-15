@@ -159,17 +159,23 @@ router.post("/reject/application/:id", [authToken], async (req, res) => {
 });
 
 router.get("/contractors", [authToken], async (req, res) => {
-  const Contractors = await contractors.findAll();
+  const Contractors = await contractors.findAll({
+    attributes: { exclude: ["password"] }
+  });
   res.status(200).send(Contractors);
 });
 
 router.get("/users", [authToken], async (req, res) => {
-  const Users = await users.findAll();
+  const Users = await users.findAll({
+    attributes: { exclude: ["password"] }
+  });
   res.status(200).send(Users);
 });
 
 router.get("/admins", [authToken], async (req, res) => {
-  const Admins = await admins.findAll();
+  const Admins = await admins.findAll({
+    attributes: { exclude: ["password"] }
+  });
   res.status(200).send(Admins);
 });
 
@@ -191,7 +197,9 @@ router.get("/admin/:id", [authToken], async (req, res) => {
 });
 
 router.get("/applications", [authToken], async (req, res) => {
-  const Applications = await application.findAll();
+  const Applications = await application.findAll({
+    attributes: { exclude: ["password"] }
+  });
   res.status(200).send(Applications);
 });
 
