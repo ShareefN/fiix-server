@@ -40,5 +40,6 @@ module.exports = app => {
   // CATEGORIES ROUTES
   app.use("/categories", categories);
 
-  app.use('/reviews', review)
+  // REVIEWS ROUTES
+  app.use('/reviews', review);
 };
