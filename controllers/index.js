@@ -5,6 +5,7 @@ const admins = require('./adminController');
 const report = require('./reportController');
 const categories = require('./categoryController');
 const review = require('./reviewController');
+const forgotPassword = require('./forgotPassword');
 
 module.exports = {
   users,
@@ -13,5 +14,6 @@ module.exports = {
   admins,
   report,
   categories,
-  review
+  review,
+  forgotPassword
 };

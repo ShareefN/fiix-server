@@ -7,7 +7,8 @@ const {
   contractors,
   report,
   categories,
-  review
+  review,
+  forgotPassword
 } = require("../controllers");
 
 module.exports = app => {
@@ -42,4 +43,7 @@ module.exports = app => {
 
   // REVIEWS ROUTES
   app.use('/reviews', review);
+
+  // FORGOT PASSWORD
+  app.use('/reset', forgotPassword);
 };

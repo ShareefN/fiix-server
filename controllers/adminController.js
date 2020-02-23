@@ -256,20 +256,24 @@ router.put("/prohibit/contractor/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put("/activate/contractor/:id", [authToken, superAdmin], async (req, res) => {
-  const Contractor = await contractors.findOne({
-    where: { id: req.params.id }
-  });
-  if (!Contractor) return res.status(404).send({ message: "Not found" });
+router.put(
+  "/activate/contractor/:id",
+  [authToken, superAdmin],
+  async (req, res) => {
+    const Contractor = await contractors.findOne({
+      where: { id: req.params.id }
+    });
+    if (!Contractor) return res.status(404).send({ message: "Not found" });
 
-  if (Contractor.status == "active")
-    return res.status(400).send({ message: "Contractor already active" });
+    if (Contractor.status == "active")
+      return res.status(400).send({ message: "Contractor already active" });
 
-  await contractors
-    .update({ status: "active" }, { where: { id: req.params.id } })
-    .then(() => res.status(200).send({ message: "success" }))
-    .catch(err => res.status(500).send({ error: err.message }));
-});
+    await contractors
+      .update({ status: "active" }, { where: { id: req.params.id } })
+      .then(() => res.status(200).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err.message }));
+  }
+);
 
 router.put("/update/admin/password/:id", [authToken], async (req, res) => {
   const admin = await admins.findOne({ where: { id: req.params.id } });
@@ -294,25 +298,33 @@ router.put("/update/admin/password/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put("/deactivate/admin/:id", [authToken, superAdmin], async (req, res) => {
-  const admin = await admins.findOne({ where: { id: req.params.id } });
-  if (!admin) return res.status(404).send({ message: "Not found" });
+router.put(
+  "/deactivate/admin/:id",
+  [authToken, superAdmin],
+  async (req, res) => {
+    const admin = await admins.findOne({ where: { id: req.params.id } });
+    if (!admin) return res.status(404).send({ message: "Not found" });
 
-  if (admin.status !== "active")
-    return res.status(400).send({ message: `Admin already ${admin.status}` });
+    if (admin.status !== "active")
+      return res.status(400).send({ message: `Admin already ${admin.status}` });
 
-  await admins
-    .update({ status: "deactivated" }, { where: { id: req.params.id } })
-    .then(() => res.status(200).send({ message: "success", nextStep: "login" }))
-    .catch(err => res.status(500).send({ error: err.message }));
-});
+    await admins
+      .update({ status: "deactivated" }, { where: { id: req.params.id } })
+      .then(() =>
+        res.status(200).send({ message: "success", nextStep: "login" })
+      )
+      .catch(err => res.status(500).send({ error: err.message }));
+  }
+);
 
 router.put("/prohibit/admin/:id", [authToken, superAdmin], async (req, res) => {
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send({ message: "Not found" });
 
   if (admin.status !== "active")
-    return res.status(400).send({ message: `Admin account already ${admin.status}` });
+    return res
+      .status(400)
+      .send({ message: `Admin account already ${admin.status}` });
 
   await admins
     .update({ status: "prohibited" }, { where: { id: req.params.id } })
@@ -342,5 +354,19 @@ router.put("/handle/report/:id", [authToken], async (req, res) => {
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
+
+router.put(
+  "/update/admin/:adminId",
+  [authToken],
+  async (req, res) => {
+    const admin = await admins.findOne({ where: { id: req.params.adminId } });
+    if (!admin) return res.status(404).send({ message: "Not found" });
+
+    await admins
+      .update(req.body, { where: { id: req.params.adminId } })
+      .then(() => res.status(200).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err.messgae }));
+  }
+);
 
 module.exports = router;

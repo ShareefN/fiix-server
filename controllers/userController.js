@@ -74,9 +74,7 @@ router.post("/user/login", async (req, res) => {
     return res.status(404).send({ message: "Invalid email or password" });
 
   if (user.status !== "active")
-    return res
-      .status(403)
-      .send({ message: `User account is ${user.status}` });
+    return res.status(403).send({ message: `User account is ${user.status}` });
 
   const validatePassword = await bcrypt.compare(
     req.body.password,
@@ -166,7 +164,10 @@ router.put("/deactivate/user/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.post("/reset/userpassword/:id", async (req, res) => {
+router.post("/forgot/password", async (req, res) => {
+  const user = await users.findOne({ where: { email: req.body.email } });
+  if(!user) return res.status(404).send({message: 'Not found'})
+
   // send email to user with input to enter new password
 });
 
