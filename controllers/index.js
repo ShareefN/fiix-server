@@ -7,6 +7,7 @@ const categories = require('./categoryController');
 const review = require('./reviewController');
 const forgotPassword = require('./forgotPassword');
 const testCases = require('./testCasesController');
+// const statistics = require('./statsController');
 
 module.exports = {
   users,
@@ -17,5 +18,6 @@ module.exports = {
   categories,
   review,
   forgotPassword,
-  testCases
+  testCases,
+  // statistics
 };

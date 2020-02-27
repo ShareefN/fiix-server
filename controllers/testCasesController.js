@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authToken = require("../middleware/authenticate");
-const _ = require("lodash");
+const superAuth = require("../middleware/superAdmin");
 const { TestCases, categories } = require("../models");
 
 router.post("/test/:categoryId", [authToken], async (req, res) => {
@@ -38,12 +38,12 @@ router.put("/finish/:categoryId/:caseId", [authToken], async (req, res) => {
       { status: "show", notes: null },
       { where: { id: req.params.categoryId } }
     )
-    .then(async res => {
+    .then(async () => {
       await TestCases.update(
         { outcome: req.body.outcome },
         { where: { id: req.params.caseId } }
       )
-        .then(res => res.status(200).send({ message: "succes" }))
+        .then(() => res.status(200).send({ message: "succes" }))
         .catch(err =>
           res
             .status(500)
@@ -53,6 +53,28 @@ router.put("/finish/:categoryId/:caseId", [authToken], async (req, res) => {
     .catch(err =>
       res.status(500).send({ error: `Error updating category: ${err}` })
     );
+});
+
+router.put("/update/case/:caseId", [authToken], async (req, res) => {
+  const testCase = await TestCases.findOne({
+    where: { id: req.params.caseId }
+  });
+  if (!testCase) return res.status(404).send({ message: "Not Found" });
+
+  await TestCases.update(req.body, { where: { id: req.params.caseId } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
+});
+
+router.delete("/case/:caseId", [authToken, superAuth], async (req, res) => {
+  const testCase = await TestCases.findOne({
+    where: { id: req.params.caseId }
+  });
+  if (!testCase) return res.status(404).send({ message: "Not Found" });
+
+  await TestCases.destroy({ where: { id: req.params.caseId } })
+    .then(() => res.status(200).send({ message: "succes" }))
+    .catch(err => res.status(500).send({ error: err.message }));
 });
 
 module.exports = router;
