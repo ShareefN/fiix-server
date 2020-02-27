@@ -8,7 +8,8 @@ const {
   report,
   categories,
   review,
-  forgotPassword
+  forgotPassword,
+  testCases
 } = require("../controllers");
 
 module.exports = app => {
@@ -43,6 +44,9 @@ module.exports = app => {
 
   // REVIEWS ROUTES
   app.use('/reviews', review);
+
+  // TEST CASES ROUTES
+  app.use('/testing', testCases);
 
   // FORGOT PASSWORD
   app.use('/reset', forgotPassword);
