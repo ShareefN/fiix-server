@@ -22,7 +22,7 @@ router.put("/stats", [authToken], async (req, res) => {
   const testCases = await TestCases.findAll();
   const user = await users.findAll();
   const review = await reviews.findAll();
-  console.log('jdaf')
+
   await stats.update({
       users: user.length,
       contractors: contractor.length,
