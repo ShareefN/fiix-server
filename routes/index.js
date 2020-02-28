@@ -10,7 +10,7 @@ const {
   review,
   forgotPassword,
   testCases,
-  // statistics
+  statistics
 } = require("../controllers");
 
 module.exports = app => {
@@ -50,7 +50,7 @@ module.exports = app => {
   app.use('/testing', testCases);
 
   // STATS ROUTES
-  // app.use('/statistics', statistics)
+  app.use('/statistics', statistics)
 
   // FORGOT PASSWORD
   app.use('/reset', forgotPassword);

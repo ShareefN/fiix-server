@@ -11,11 +11,11 @@ const {
   users,
   stats
 } = require("../models");
-const { authToken } = require("../middleware/authenticate");
+const authToken = require("../middleware/authenticate");
 
-router.put("/stats", [authToken], async (req, res) => {
+router.post("/stats", [authToken], async (req, res) => {
   const admin = await admins.findAll();
-  const applications = await application.findAll();
+  const appli = await application.findAll();
   const categorie = await categories.findAll();
   const contractor = await contractors.findAll();
   const report = await reports.findAll();
@@ -23,11 +23,17 @@ router.put("/stats", [authToken], async (req, res) => {
   const user = await users.findAll();
   const review = await reviews.findAll();
 
-  await stats.update({
+  await stats.destroy({
+    where: {},
+    truncate: true
+  });
+
+  await stats
+    .create({
       users: user.length,
       contractors: contractor.length,
       categories: categorie.length,
-      applications: applications.length,
+      applications: appli.length,
       feedbacks: report.length,
       testCases: testCases.length,
       admins: admin.length,
