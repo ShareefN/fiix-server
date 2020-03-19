@@ -6,6 +6,11 @@ const config = require("config");
 const authToken = require("../middleware/authenticate");
 const _ = require("lodash");
 const { contractors, users } = require("../models");
+const Nexmo = require("nexmo");
+const nexmo = new Nexmo({
+  apiKey: "4a1dcce6",
+  apiSecret: "ZnAI64DyUHDSa4fv"
+});
 
 generateAuthToken = admin => {
   const token = jwt.sign({ admin }, config.get("jwtPrivateKey"));
@@ -15,17 +20,26 @@ generateAuthToken = admin => {
 router.post("/user/mobile", async (req, res) => {
   const isFound = await users.findOne({ where: { number: req.body.number } });
 
-  if (!isFound)
-    return res.status(404).send({ error: "mobile number not found" });
-
-  if (isFound.status !== "active")
+  if (isFound && isFound.status !== "active")
     return res.status(403).send({
-      message: `User account ${isFound.dataValue.status}`,
+      message: `User account ${isFound.status}`,
       notes: isFound.notes
     });
 
-  res.status(200).send({ message: "mobile number found" });
-
+  await nexmo.verify.request(
+    {
+      number: `962${req.body.number}`,
+      brand: "FiiX Verificatione Code"
+    },
+    (err, result) => {
+      if (err) {
+        return res.status(500).send({ error: err.message });
+      } else {
+        const verifyRequestId = result.request_id;
+        console.log("request_id", verifyRequestId);
+      }
+    }
+  );
   // handle sms otp verification for found or not found cases
 
   // if found and verified, generate token and send to dashboard
@@ -166,7 +180,7 @@ router.put("/deactivate/user/:id", [authToken], async (req, res) => {
 
 router.post("/forgot/password", async (req, res) => {
   const user = await users.findOne({ where: { email: req.body.email } });
-  if(!user) return res.status(404).send({message: 'Not found'})
+  if (!user) return res.status(404).send({ message: "Not found" });
 
   // send email to user with input to enter new password
 });

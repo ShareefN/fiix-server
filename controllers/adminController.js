@@ -44,11 +44,10 @@ router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
         "id",
         "name",
         "email",
+        "phone",
         "isSuperAdmin",
         "status"
       ]);
-
-      // send email to admin with generated one time password to login
 
       res.status(201).send({ message: "success", nextStep: "login", result });
     })
@@ -355,18 +354,14 @@ router.put("/handle/report/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put(
-  "/update/admin/:adminId",
-  [authToken],
-  async (req, res) => {
-    const admin = await admins.findOne({ where: { id: req.params.adminId } });
-    if (!admin) return res.status(404).send({ message: "Not found" });
+router.put("/update/admin/:adminId", [authToken], async (req, res) => {
+  const admin = await admins.findOne({ where: { id: req.params.adminId } });
+  if (!admin) return res.status(404).send({ message: "Not found" });
 
-    await admins
-      .update(req.body, { where: { id: req.params.adminId } })
-      .then(() => res.status(200).send({ message: "success" }))
-      .catch(err => res.status(500).send({ error: err.messgae }));
-  }
-);
+  await admins
+    .update(req.body, { where: { id: req.params.adminId } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.messgae }));
+});
 
 module.exports = router;
