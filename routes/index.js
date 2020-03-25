@@ -10,7 +10,8 @@ const {
   review,
   forgotPassword,
   testCases,
-  statistics
+  statistics,
+  userApp,
 } = require("../controllers");
 
 module.exports = app => {
@@ -24,6 +25,9 @@ module.exports = app => {
   app.get("/", (req, res) => {
     res.status(200).send({ message: "Server is alive!" });
   });
+
+  // USER APP ROUTES
+  app.use('/app', userApp)
 
   // ADMIN ROUTES
   app.use("/admins", admins);
@@ -44,14 +48,14 @@ module.exports = app => {
   app.use("/categories", categories);
 
   // REVIEWS ROUTES
-  app.use('/reviews', review);
+  app.use("/reviews", review);
 
   // TEST CASES ROUTES
-  app.use('/testing', testCases);
+  app.use("/testing", testCases);
 
   // STATS ROUTES
-  app.use('/statistics', statistics)
+  app.use("/statistics", statistics);
 
   // FORGOT PASSWORD
-  app.use('/reset', forgotPassword);
+  app.use("/reset", forgotPassword);
 };
