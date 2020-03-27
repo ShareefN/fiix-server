@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "NODE_ENV=test",
     "start": "PORT=5050 NODE_ENV=development nodemon index.js"
   },
   "author": "Shareef\tN",

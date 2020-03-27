@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/505e2b92-ba84-42fa-a122-90be6498bb35/resourceGroups/fiixapp/providers/Microsoft.Web/sites/fiixapplication",
+  "appService.deploySubpath": ""
+}
