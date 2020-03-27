@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const authToken = require('../middleware/authenticate');
-const _ = require('lodash');
 const {reports, users} = require('../models');
 
 router.post('/report/:id', [authToken], async (req, res) => {

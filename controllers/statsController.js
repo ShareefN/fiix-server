@@ -43,4 +43,11 @@ router.post("/stats", [authToken], async (req, res) => {
     .catch(err => res.stats(500).send({ error: err.message }));
 });
 
+router.get("/read/stats", [authToken], async (req, res) => {
+  const statistics = await stats.findAll({
+    attributes: { exclude: ["id", "createdAt", "updatedAt"] }
+  });
+  res.status(200).send(statistics);
+});
+
 module.exports = router;

@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const authToken = require("../middleware/authenticate");
-const _ = require("lodash");
 const { contractors, users, reviews } = require("../models");
 
 router.get("/user/:userId", [authToken], async (req, res) => {
-  const user = await users.findOne({ where: { id: req.params.userId } });
+  const user = await users.findOne({ where: { id: req.params.userId }, attributes: {exclude: ['password']} });
   if (!user) return res.status(404).send({ message: "Not found" });
 
   if (user.status.toLowerCase() !== "active")
@@ -24,7 +23,7 @@ router.get("/contractors/:category", [authToken], async (req, res) => {
 });
 
 router.get('/reviews', [authToken], async (req, res) => {
-  const reviewsList = await reviews.findAll({attributes: {exclude: ['updatedAt', 'userIds']}})
+  const reviewsList = await reviews.findAll({attributes: {exclude: ['userId', 'updatedAt', 'userIds']}})
   res.status(200).send(reviewsList)
 })
 
