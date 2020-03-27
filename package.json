@@ -4,15 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NOVE_ENV=test",
     "start": "PORT=5050 NODE_ENV=development nodemon index.js"
   },
   "author": "Shareef\tN",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^3.0.7",
+    "bcrypt": "^3.0.8",
     "body-parser": "^1.19.0",
-    "config": "^3.2.5",
+    "config": "^3.3.1",
     "express": "^4.17.1",
     "express-winston": "^4.0.2",
     "joi": "^14.3.1",
