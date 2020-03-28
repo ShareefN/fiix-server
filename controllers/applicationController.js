@@ -7,7 +7,7 @@ router.post("/apply/:id", [authToken], async (req, res) => {
   const user = await users.findOne({ where: { id: req.params.id } });
   if (!user) return res.status(404).send({ message: "Not found" });
 
-  if (user.status !== "active")
+  if (user.status.toLowerCase() !== "active")
     return res
       .status(403)
       .send({
@@ -18,7 +18,7 @@ router.post("/apply/:id", [authToken], async (req, res) => {
 
   if (user.applicationStatus !== null)
     return res.status(403).send({
-      message: `User ${user.applicationStatus}`,
+      message: `User already applied and is ${user.applicationStatus}`,
       status: user.status,
       notes: user.notes
     });

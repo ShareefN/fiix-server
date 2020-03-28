@@ -92,13 +92,9 @@ router.post("/approve/application/:id", [authToken], async (req, res) => {
   const checkUser = await users.findOne({ where: { email: applicant.email } });
   if (
     !checkUser ||
-    checkUser.status !== "active" ||
+    checkUser.status.toLowerCase() !== "active" ||
     checkUser.applicationStatus == "rejected"
   ) {
-    await application
-      .destroy({ where: { id: req.params.id } })
-      .then(() => res.status(200))
-      .catch(error => res.status(500).send({ error: error }));
     return res
       .status(403)
       .send({ UserStatus: checkUser.status, notes: checkUser.notes });
