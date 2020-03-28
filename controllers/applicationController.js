@@ -36,6 +36,7 @@ router.post("/apply/:id", [authToken], async (req, res) => {
     name: `${req.body.firstName} ${req.body.lastName}`,
     email: user.email,
     number: user.number,
+    gender: user.gender,
     password: user.password,
     location: req.body.location,
     timeIn: req.body.timeIn,
