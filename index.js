@@ -1,7 +1,6 @@
 const express = require("express");
 const config = require('config');
 const port = process.env.PORT || 3030;
-const http = require('http');
 
 const app = express();
 
@@ -17,12 +16,6 @@ process.on("unhandledRejection", err => {
 if (!config.get("jwtPrivateKey")) {
   throw new Error("Error: jwtPrivateKey is not defined.");
 }
-
-var server = http.createServer(function(req, res) {
-  res.writeHead(200);
-  res.end('Hello Azure');
-});
-server.listen(process.env.PORT);
 
 require("./routes/index")(app);
 
