@@ -92,7 +92,7 @@ router.post("/approve/application/:id", [authToken], async (req, res) => {
   const checkUser = await users.findOne({ where: { email: applicant.email } });
   if (
     !checkUser ||
-    checkUser.status.toLowerCase() !== "active" ||
+    checkUser.status !== "ACTIVE" ||
     checkUser.applicationStatus == "rejected"
   ) {
     return res
@@ -101,7 +101,7 @@ router.post("/approve/application/:id", [authToken], async (req, res) => {
   }
 
   await contractors
-    .create(applicant)
+    .create(applicant.dataValues)
     .then(() => res.status(200))
     .catch(error => res.status(500).send({ error: error.message }));
 
