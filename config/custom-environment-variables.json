@@ -1,3 +1,4 @@
 {
-    "jwtPrivateKey": "fiix_jwtPrivateKey"
+    "jwtPrivateKey": "fiix_jwtPrivateKey",
+    "db": "fiix_db"
 }
