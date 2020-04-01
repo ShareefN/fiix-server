@@ -18,6 +18,7 @@ if (!config.get("jwtPrivateKey")) {
 }
 
 require("./routes/index")(app);
+require('./config/prod')(app)
 
 app.listen(port, () => {
   console.log(`Sever connected on port:${port}`);
