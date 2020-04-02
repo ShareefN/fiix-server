@@ -22,7 +22,7 @@ router.get("/contractors/:category", [authToken], async (req, res) => {
   res.status(200).send(contractorsList)
 });
 
-router.get('/reviews', [authToken], async (req, res) => {
+router.get('/reviews', async (req, res) => {
   const reviewsList = await reviews.findAll({attributes: {exclude: ['userId', 'updatedAt', 'userIds']}})
   res.status(200).send(reviewsList)
 })
