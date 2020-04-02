@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "production") {
     var reqType = req.headers["x-forwarded-proto"];
     reqType == "https"
       ? next()
-      : res.redirect("https://" + req.headers.host + req.url);
+      : res.redirect("http://" + req.headers.host + req.url);
   });
 }
 
