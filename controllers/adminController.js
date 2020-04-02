@@ -55,6 +55,9 @@ router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
 });
 
 router.post("/auth/login", async (req, res) => {
+  if (!req.body.email || !req.body.password)
+    return res.status(400).send({ message: "Bad Request" });
+    
   const admin = await admins.findOne({ where: { email: req.body.email } });
   if (!admin)
     return res.status(404).send({ message: "Invalid email or password" });

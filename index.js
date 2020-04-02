@@ -1,8 +1,10 @@
 const express = require("express");
 const config = require('config');
 const port = process.env.PORT || 3030;
+const http = require('http');
 
 const app = express();
+const server = http.createServer(app);
 
 process.on("uncaughtException", err => {
   console.log(err.message);
@@ -20,6 +22,6 @@ if (!config.get("jwtPrivateKey")) {
 require("./routes/index")(app);
 require('./config/prod')(app)
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Sever connected on port:${port}`);
 });
