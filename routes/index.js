@@ -11,7 +11,7 @@ const {
   forgotPassword,
   testCases,
   statistics,
-  userApp,
+  userApp
 } = require("../controllers");
 
 module.exports = app => {
@@ -26,8 +26,17 @@ module.exports = app => {
     res.status(200).send({ message: "Server is alive!" });
   });
 
+  app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+  });
+
   // USER APP ROUTES
-  app.use('/app', userApp)
+  app.use("/app", userApp);
 
   // ADMIN ROUTES
   app.use("/admins", admins);

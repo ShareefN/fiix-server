@@ -27,8 +27,4 @@ router.get('/reviews', [authToken], async (req, res) => {
   res.status(200).send(reviewsList)
 })
 
-router.get('/test', async(req, res) => {
-  res.status(200).send('this')
-})
-
 module.exports = router;
