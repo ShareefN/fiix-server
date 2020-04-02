@@ -1,10 +1,19 @@
 const express = require("express");
-const config = require('config');
+const config = require("config");
 const port = process.env.PORT || 3030;
-const http = require('http');
 
 const app = express();
-const server = http.createServer(app);
+
+var server = require("http").createServer(app);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(function(req, res, next) {
+    var reqType = req.headers["x-forwarded-proto"];
+    reqType == "https"
+      ? next()
+      : res.redirect("https://" + req.headers.host + req.url);
+  });
+}
 
 process.on("uncaughtException", err => {
   console.log(err.message);
@@ -20,7 +29,7 @@ if (!config.get("jwtPrivateKey")) {
 }
 
 require("./routes/index")(app);
-require('./config/prod')(app)
+require("./config/prod")(app);
 
 server.listen(port, () => {
   console.log(`Sever connected on port:${port}`);
