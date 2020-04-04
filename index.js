@@ -1,11 +1,10 @@
 const express = require("express");
 const config = require("config");
-const http = require("http");
 const port = process.env.PORT || 3030;
 
 const app = express();
 
-var server = require("http").createServer(app);
+const server = require("http").createServer(app);
 
 // if (process.env.NODE_ENV === "production") {
 //   app.use(function(req, res, next) {
