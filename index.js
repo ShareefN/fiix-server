@@ -6,14 +6,14 @@ const app = express();
 
 var server = require("http").createServer(app);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(function(req, res, next) {
-    var reqType = req.headers["x-forwarded-proto"];
-    reqType == "https"
-      ? next()
-      : res.redirect("https://" + req.headers.host + req.url);
-  });
-}
+// if (process.env.NODE_ENV === "production") {
+//   app.use(function(req, res, next) {
+//     var reqType = req.headers["x-forwarded-proto"];
+//     reqType == "https"
+//       ? next()
+//       : res.redirect("https://" + req.headers.host + req.url);
+//   });
+// }
 
 process.on("uncaughtException", err => {
   console.log(err.message);
