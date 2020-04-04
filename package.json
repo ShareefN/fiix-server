@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test",
-    "start": "node index.js",
+    "start": "NODE_ENV=production node index.js",
     "local": "NODE_ENV=development nodemon index.js"
   },
   "engines": {
