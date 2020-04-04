@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test",
-    "start": "NODE_ENV=production node index.js",
+    "start": "node index.js",
     "local": "NODE_ENV=development nodemon index.js"
   },
   "engines": {
@@ -18,6 +18,7 @@
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "config": "^3.3.1",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-winston": "^4.0.2",
     "helmet": "^3.22.0",
@@ -30,6 +31,7 @@
     "nexmo": "^2.6.0",
     "nodemailer": "^6.4.2",
     "nodemon": "^2.0.2",
+    "path": "^0.12.7",
     "sequelize": "^5.21.5",
     "winston": "^3.2.1",
     "winston-papertrail": "^1.0.5"

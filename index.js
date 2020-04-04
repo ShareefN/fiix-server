@@ -1,19 +1,24 @@
+require("dotenv").config();
 const express = require("express");
 const config = require("config");
 const port = process.env.PORT || 3030;
+const db = require("./models");
 
 const app = express();
 
-// if (process.env.NODE_ENV === "production") {
-//   app.use(function(req, res, next) {
-//     var reqType = req.headers["x-forwarded-proto"];
-//     reqType == "https"
-//       ? next()
-//       : res.redirect("https://" + req.headers.host + req.url);
-//   });
-// }
-
 const server = require("http").createServer(app);
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  console.log("check error ===> ", err);
+  res.locals.message = err.message;
+  res.locals.error = req.app.get("env") === "development" ? err : {};
+  // render the error page
+  res.status(err.status || 500);
+  res.render("error");
+  console.log(err);
+});
 
 process.on("uncaughtException", err => {
   console.log(err.message);
@@ -31,6 +36,8 @@ if (!config.get("jwtPrivateKey")) {
 require("./routes/index")(app);
 require("./config/prod")(app);
 
-server.listen(port, () => {
-  console.log(`Sever connected on port:${port}`);
+db.sequelize.sync({}).then(function() {
+  app.listen(port, function() {
+    console.log("Listening on localhost:" + port);
+  });
 });
