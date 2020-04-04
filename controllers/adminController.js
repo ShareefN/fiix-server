@@ -77,6 +77,7 @@ router.post("/auth/login", async (req, res) => {
     "id",
     "name",
     "name",
+    "phone",
     "isSuperAdmin",
     "status"
   ]);
