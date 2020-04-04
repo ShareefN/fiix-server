@@ -1,4 +1,5 @@
 {
     "jwtPrivateKey": "fiix_jwtPrivateKey",
-    "db": "fiix_db"
+    "db": "fiix_db",
+    "use_env_variable": "JAWSDB_URL"
 }
