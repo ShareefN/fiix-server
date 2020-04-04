@@ -4,14 +4,14 @@ const port = process.env.PORT || 3030;
 
 const app = express();
 
-if (process.env.NODE_ENV === "production") {
-  app.use(function(req, res, next) {
-    var reqType = req.headers["x-forwarded-proto"];
-    reqType == "https"
-      ? next()
-      : res.redirect("https://" + req.headers.host + req.url);
-  });
-}
+// if (process.env.NODE_ENV === "production") {
+//   app.use(function(req, res, next) {
+//     var reqType = req.headers["x-forwarded-proto"];
+//     reqType == "https"
+//       ? next()
+//       : res.redirect("https://" + req.headers.host + req.url);
+//   });
+// }
 
 const server = require("http").createServer(app);
 
