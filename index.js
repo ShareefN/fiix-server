@@ -16,15 +16,6 @@ var server = require("http").createServer(app);
 //   });
 // }
 
-if (process.env.NODE_ENV === "production") {
-  http
-    .createServer((req, res) => {
-      throw new Error("We throw an error before sending a response");
-      res.end("ok");
-    })
-    .listen(port);
-}
-
 process.on("uncaughtException", err => {
   console.log(err.message);
   process.exit(1);
