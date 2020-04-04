@@ -1,5 +1,6 @@
 const express = require("express");
 const config = require("config");
+const http = require("http");
 const port = process.env.PORT || 3030;
 
 const app = express();
@@ -14,6 +15,15 @@ var server = require("http").createServer(app);
 //       : res.redirect("https://" + req.headers.host + req.url);
 //   });
 // }
+
+if (process.env.NODE_ENV === "production") {
+  http
+    .createServer((req, res) => {
+      throw new Error("We throw an error before sending a response");
+      res.end("ok");
+    })
+    .listen(port);
+}
 
 process.on("uncaughtException", err => {
   console.log(err.message);
