@@ -21,7 +21,7 @@ generateAuthToken = admin => {
   return token;
 };
 
-router.post("/create/admin", async (req, res) => {
+router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
   const admin = await admins.findOne({ where: { email: req.body.email } });
   if (admin) return res.status(302).send({ message: "Admin already exsits" });
 
