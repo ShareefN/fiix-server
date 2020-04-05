@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 
 authToken = async (req, res, next) => {
-  const validateToken = await req.header("x-auth-token");
+  const validateToken = await req.header("Authorization");
   if (!validateToken)
     return res
       .status(404)
