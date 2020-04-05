@@ -22,7 +22,9 @@ generateAuthToken = admin => {
 };
 
 router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
-  const admin = await admins.findOne({ where: { email: req.body.email } });
+  const admin = await admins.findOne({
+    where: { email: req.body.email }
+  });
   if (admin) return res.status(302).send({ message: "Admin already exsits" });
 
   const isContractor = await contractors.findOne({
@@ -103,7 +105,7 @@ router.post("/approve/application/:id", [authToken], async (req, res) => {
   const checkUser = await users.findOne({ where: { email: applicant.email } });
   if (
     !checkUser ||
-    checkUser.status !== "ACTIVE" ||
+    checkUser.status !== "active" ||
     checkUser.applicationStatus == "rejected"
   ) {
     return res

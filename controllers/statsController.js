@@ -39,15 +39,13 @@ router.post("/stats", [authToken], async (req, res) => {
       admins: admin.length,
       reviews: review.length
     })
-    .then(() => res.status(200).send({ message: "success" }))
+    .then(async () => {
+      const statistics = await stats.findAll({
+        attributes: { exclude: ["id", "createdAt", "updatedAt"] }
+      });
+      res.status(200).send(statistics);
+    })
     .catch(err => res.stats(500).send({ error: err.message }));
-});
-
-router.get("/read/stats", [authToken], async (req, res) => {
-  const statistics = await stats.findAll({
-    attributes: { exclude: ["id", "createdAt", "updatedAt"] }
-  });
-  res.status(200).send(statistics);
 });
 
 module.exports = router;
