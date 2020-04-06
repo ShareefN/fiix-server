@@ -4,8 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     phone: DataTypes.STRING,
+    role: DataTypes.STRING,
     password: DataTypes.STRING,
-    isSuperAdmin: DataTypes.STRING,
     status: DataTypes.STRING
   }, {});
   admins.associate = function(models) {

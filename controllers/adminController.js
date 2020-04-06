@@ -45,7 +45,7 @@ router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
       email: req.body.email,
       phone: req.body.phone,
       password: req.body.password,
-      isSuperAdmin: req.body.isSuperAdmin,
+      role: req.body.role,
       status: "active"
     })
     .then(async admin => {
@@ -54,7 +54,7 @@ router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
         "name",
         "email",
         "phone",
-        "isSuperAdmin",
+        "role",
         "status"
       ]);
 
@@ -87,7 +87,7 @@ router.post("/auth/login", async (req, res) => {
     "name",
     "name",
     "phone",
-    "isSuperAdmin",
+    "role",
     "status"
   ]);
 
@@ -195,7 +195,7 @@ router.get("/admin/:id", [authToken], async (req, res) => {
     "id",
     "name",
     "email",
-    "isSuperAdmin",
+    "role",
     "status",
     "createdAt",
     "updatedAt"
