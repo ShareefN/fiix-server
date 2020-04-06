@@ -12,7 +12,7 @@ process.on("uncaughtException", err => {
 });
 
 process.on("unhandledRejection", err => {
-  throw new Error("Expected promise to be rejected");
+  throw new Error("Expected promise to be rejected", err);
 });
 
 if (!config.get("jwtPrivateKey")) {
