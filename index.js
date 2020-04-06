@@ -19,17 +19,6 @@ if (!config.get("jwtPrivateKey")) {
   throw new Error("Error: jwtPrivateKey is not defined.");
 }
 
-app.use(function(req, res, next) {
-  req.headers("Access-Control-Allow-Origin: *");
-  req.headers(
-    "Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS"
-  );
-  req.headers(
-    "Access-Control-Allow-Headers: Origin, Content-Type, Authorization"
-  );
-  next();
-});
-
 require("./routes/index")(app);
 require("./config/prod")(app);
 
