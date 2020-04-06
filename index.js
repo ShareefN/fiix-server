@@ -20,11 +20,13 @@ if (!config.get("jwtPrivateKey")) {
 }
 
 app.use(function(req, res, next) {
-  header("Access-Control-Allow-Origin: *");
-  header(
+  req.headers("Access-Control-Allow-Origin: *");
+  req.headers(
     "Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS"
   );
-  header("Access-Control-Allow-Headers: Origin, Content-Type, Authorization");
+  req.headers(
+    "Access-Control-Allow-Headers: Origin, Content-Type, Authorization"
+  );
   next();
 });
 
