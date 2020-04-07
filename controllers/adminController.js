@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+var cors = require("cors");
 const config = require("config");
 const authToken = require("../middleware/authenticate");
 const superAdmin = require("../middleware/superAdmin");
@@ -63,7 +64,7 @@ router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.post("/auth/login", async (req, res) => {
+router.post("/auth/login", cors(), async (req, res) => {
   if (!req.body.email || !req.body.password)
     return res.status(400).send({ message: "Bad Request" });
 
