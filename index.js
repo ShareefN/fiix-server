@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const config = require("config");
-var cors = require('cors')
 const port = process.env.PORT || 3030;
 const db = require("./models");
 
@@ -19,8 +18,6 @@ process.on("unhandledRejection", err => {
 if (!config.get("jwtPrivateKey")) {
   throw new Error("Error: jwtPrivateKey is not defined.");
 }
-
-app.use(cors());
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
