@@ -48,6 +48,8 @@ router.post("/user/mobile", async (req, res) => {
 });
 
 router.post("/user/register", async (req, res) => {
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
+
   const isFound = await users.findOne({ where: { email: req.body.email } });
   if (isFound) return res.status(409).send({ message: "User already exists" });
 
@@ -66,7 +68,7 @@ router.post("/user/register", async (req, res) => {
       email: req.body.email,
       password: req.body.password,
       number: req.body.number,
-      status: 'active'
+      status: "active"
     })
     .then(async user => {
       const token = await generateAuthToken(user);

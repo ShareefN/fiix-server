@@ -35,7 +35,7 @@ module.exports = app => {
   app.use("/admins", admins);
 
   // USER ROUTES
-  app.use("/auth", users);
+  app.use("/users", users);
 
   // APPLICATION ROUTES
   app.use("/application", application);
