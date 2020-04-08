@@ -61,7 +61,13 @@ router.post("/user/register", async (req, res) => {
   req.body.password = await bcrypt.hash(req.body.password, salt);
 
   await users
-    .create(req.body)
+    .create({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+      number: req.body.number,
+      status: 'active'
+    })
     .then(async user => {
       const token = await generateAuthToken(user);
       const User = await _.pick(user, [
