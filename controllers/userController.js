@@ -6,11 +6,6 @@ const config = require("config");
 const authToken = require("../middleware/authenticate");
 const _ = require("lodash");
 const { contractors, users } = require("../models");
-const Nexmo = require("nexmo");
-const nexmo = new Nexmo({
-  apiKey: "4a1dcce6",
-  apiSecret: "ZnAI64DyUHDSa4fv"
-});
 
 generateAuthToken = admin => {
   const token = jwt.sign({ admin }, config.get("jwtPrivateKey"));
