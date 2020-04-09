@@ -4,9 +4,9 @@ const config = require("config");
 const port = process.env.PORT || 3030;
 const db = require("./models");
 var cors = require("cors");
+const bodyParser = require("body-parser");
 
 const app = express();
-app.use(cors());
 
 process.on("uncaughtException", err => {
   console.log(err.message);
@@ -20,6 +20,10 @@ process.on("unhandledRejection", err => {
 if (!config.get("jwtPrivateKey")) {
   throw new Error("Error: jwtPrivateKey is not defined.");
 }
+
+app.use(cors())
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
