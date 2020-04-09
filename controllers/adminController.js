@@ -23,7 +23,7 @@ generateAuthToken = admin => {
 };
 
 router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const admin = await admins.findOne({
     where: { email: req.body.email }
@@ -101,7 +101,7 @@ router.post("/auth/login", async (req, res) => {
 });
 
 router.post("/approve/application/:id", [authToken], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const applicant = await application.findOne({ where: { id: req.params.id } });
   if (!applicant)
@@ -152,7 +152,7 @@ router.post("/approve/application/:id", [authToken], async (req, res) => {
 });
 
 router.post("/reject/application/:id", [authToken], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const applicant = await application.findOne({ where: { id: req.params.id } });
   if (!applicant)
@@ -187,6 +187,26 @@ router.get("/users", [authToken], async (req, res) => {
   res.status(200).send(Users);
 });
 
+router.get("/user/:userId", [authToken], async (req, res) => {
+  if (!req.params.userId)
+    return res.status(400).send({ message: "Bad Request" });
+
+  const user = await users.findOne({ where: { id: req.params.id } });
+  if (!user) return res.status(404).send({ message: "Not found" });
+
+  const result = await _.pick(user, [
+    "username",
+    "email",
+    "phone",
+    "status",
+    "applicationStatus",
+    "notes",
+    "createdAt",
+    "updatedAt"
+  ]);
+  res.status(200).send(result);
+});
+
 router.get("/admins", [authToken], async (req, res) => {
   const Admins = await admins.findAll({
     attributes: { exclude: ["password"] }
@@ -203,12 +223,13 @@ router.get("/admin/:id", [authToken], async (req, res) => {
     "name",
     "email",
     "role",
+    "phone",
     "status",
     "createdAt",
     "updatedAt"
   ]);
 
-  res.status(200).send({ message: "success", result });
+  res.status(200).send({ result });
 });
 
 router.get("/applications", [authToken], async (req, res) => {
@@ -219,7 +240,7 @@ router.get("/applications", [authToken], async (req, res) => {
 });
 
 router.put("/prohibit/user/:id", [authToken], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const User = await users.findOne({ where: { id: req.params.id } });
   if (!User) return res.status(404).send({ message: "Not found" });
@@ -240,7 +261,7 @@ router.put("/prohibit/user/:id", [authToken], async (req, res) => {
 });
 
 router.put("/activate/user/:id", [authToken], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const User = await users.findOne({ where: { id: req.params.id } });
   if (!User) return res.status(404).send({ message: "Not found" });
@@ -255,7 +276,7 @@ router.put("/activate/user/:id", [authToken], async (req, res) => {
 });
 
 router.put("/prohibit/contractor/:id", [authToken], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const Contractor = await contractors.findOne({
     where: { id: req.params.id }
@@ -281,7 +302,7 @@ router.put(
   "/activate/contractor/:id",
   [authToken, superAdmin],
   async (req, res) => {
-    if(!req.body) return res.status(400).send({message: 'Bad Request'})
+    if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
     const Contractor = await contractors.findOne({
       where: { id: req.params.id }
@@ -299,7 +320,7 @@ router.put(
 );
 
 router.put("/update/admin/password/:id", [authToken], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send("Not found");
@@ -327,7 +348,7 @@ router.put(
   "/deactivate/admin/:id",
   [authToken, superAdmin],
   async (req, res) => {
-    if(!req.body) return res.status(400).send({message: 'Bad Request'})
+    if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
     const admin = await admins.findOne({ where: { id: req.params.id } });
     if (!admin) return res.status(404).send({ message: "Not found" });
@@ -345,7 +366,7 @@ router.put(
 );
 
 router.put("/prohibit/admin/:id", [authToken, superAdmin], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send({ message: "Not found" });
@@ -362,7 +383,7 @@ router.put("/prohibit/admin/:id", [authToken, superAdmin], async (req, res) => {
 });
 
 router.put("/activate/admin/:id", [authToken, superAdmin], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const admin = await admins.findOne({ where: { id: req.params.id } });
   if (!admin) return res.status(404).send({ message: "Not found" });
@@ -377,7 +398,7 @@ router.put("/activate/admin/:id", [authToken, superAdmin], async (req, res) => {
 });
 
 router.put("/handle/report/:id", [authToken], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const isFound = await reports.findOne({ where: { id: req.params.id } });
   if (!isFound) return res.status(404).send({ message: "Not found" });
@@ -389,8 +410,8 @@ router.put("/handle/report/:id", [authToken], async (req, res) => {
 });
 
 router.put("/update/admin/:adminId", [authToken], async (req, res) => {
-  if(!req.body) return res.status(400).send({message: 'Bad Request'})
-  
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
+
   const admin = await admins.findOne({ where: { id: req.params.adminId } });
   if (!admin) return res.status(404).send({ message: "Not found" });
 
