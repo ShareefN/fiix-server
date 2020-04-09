@@ -77,7 +77,7 @@ router.post("/user/register", async (req, res) => {
 
       res
         .status(201)
-        .header("x-auth-token", token)
+        .header("Authorization", token)
         .send({ message: "success", User, token });
     })
     .catch(error => {
@@ -111,7 +111,7 @@ router.post("/user/login", async (req, res) => {
 
   res
     .status(200)
-    .header("x-auth-token", token)
+    .header("Authorization", token)
     .send({ message: "success", User, token });
 });
 

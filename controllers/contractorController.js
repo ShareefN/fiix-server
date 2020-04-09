@@ -54,7 +54,7 @@ router.post("/contractor/login", async (req, res) => {
 
   res
     .status(200)
-    .header("x-auth-token", token)
+    .header("Authorization", token)
     .send({ message: "success", nextStep: "dashboard", Contractor, token });
 });
 

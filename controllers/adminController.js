@@ -94,7 +94,7 @@ router.post("/auth/login", async (req, res) => {
 
   res
     .status(200)
-    .header("x-auth-token", token)
+    .header("Authorization", token)
     .send({ message: "success", nextStep: "dashboard", Admin, token });
 });
 
