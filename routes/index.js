@@ -1,6 +1,5 @@
 const logger = require("morgan");
 const bodyParser = require("body-parser");
-const cors = require('cors')
 const {
   users,
   admins,
@@ -22,7 +21,6 @@ module.exports = app => {
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(cors());
 
   app.get("/", (req, res) => {
     res.status(200).send({ message: "Server is alive!" });
