@@ -8,17 +8,15 @@ router.post("/apply/:id", [authToken], async (req, res) => {
   if (!user) return res.status(404).send({ message: "Not found" });
 
   if (user.status.toLowerCase() !== "active")
-    return res
-      .status(403)
-      .send({
-        message: `User account already ${user.status}`,
-        status: user.status,
-        notes: user.notes
-      });
+    return res.status(403).send({
+      message: `User account already ${user.status}`,
+      status: user.status,
+      notes: user.notes
+    });
 
   if (user.applicationStatus !== null)
     return res.status(403).send({
-      message: `User already applied and is ${user.applicationStatus}`,
+      message: `User already ${user.applicationStatus}`,
       status: user.status,
       notes: user.notes
     });
@@ -33,6 +31,7 @@ router.post("/apply/:id", [authToken], async (req, res) => {
     });
 
   const contractor = {
+    userId: user.id,
     name: `${req.body.firstName} ${req.body.lastName}`,
     email: user.email,
     number: user.number,

@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-var cors = require("cors");
 const config = require("config");
 const authToken = require("../middleware/authenticate");
 const superAdmin = require("../middleware/superAdmin");
@@ -12,7 +11,9 @@ const {
   users,
   admins,
   application,
-  reports
+  reports,
+  reviews,
+  TestCases
 } = require("../models");
 
 generateAuthToken = admin => {
@@ -175,9 +176,37 @@ router.post("/reject/application/:id", [authToken], async (req, res) => {
 
 router.get("/contractors", [authToken], async (req, res) => {
   const Contractors = await contractors.findAll({
-    attributes: { exclude: ["password"] }
+    attributes: {
+      exclude: [
+        "password",
+        "email",
+        "gender",
+        "identity",
+        "nonCriminal",
+        "notes",
+        "profileImage",
+        "rating",
+        "timeIn",
+        "timeOut"
+      ]
+    }
   });
   res.status(200).send(Contractors);
+});
+
+router.get("/contractor/:contractorId", [authToken], async (req, res) => {
+  if (!req.params.contractorId)
+    return res.status(400).send({ message: "Bad Request" });
+
+  const contractor = await contractors.findOne({
+    where: { id: req.params.contractorId },
+    attributes: {
+      exclude: ["password"]
+    }
+  });
+  if (!contractor) return res.status(404).send({ message: "Not found" });
+
+  res.status(200).send(contractor);
 });
 
 router.get("/users", [authToken], async (req, res) => {
@@ -191,13 +220,13 @@ router.get("/user/:userId", [authToken], async (req, res) => {
   if (!req.params.userId)
     return res.status(400).send({ message: "Bad Request" });
 
-  const user = await users.findOne({ where: { id: req.params.id } });
+  const user = await users.findOne({ where: { id: req.params.userId } });
   if (!user) return res.status(404).send({ message: "Not found" });
 
   const result = await _.pick(user, [
     "username",
     "email",
-    "phone",
+    "number",
     "status",
     "applicationStatus",
     "notes",
@@ -234,9 +263,35 @@ router.get("/admin/:id", [authToken], async (req, res) => {
 
 router.get("/applications", [authToken], async (req, res) => {
   const Applications = await application.findAll({
-    attributes: { exclude: ["password"] }
+    attributes: {
+      exclude: [
+        "password",
+        "email",
+        "profileImage",
+        "subCategory",
+        "identity",
+        "nonCriminal",
+        "subCategory",
+        "timeIn",
+        "timeOut",
+        "updatedAt"
+      ]
+    }
   });
   res.status(200).send(Applications);
+});
+
+router.get("/application/:applicationId", [authToken], async (req, res) => {
+  if (!req.params.applicationId)
+    return res.status(400).send({ message: "Bad Request" });
+
+  const Application = await application.findOne({
+    where: { id: req.params.applicationId },
+    attributes: { exclude: ["password"] }
+  });
+  if (!Application) return res.status(404).send({ message: "Not found" });
+
+  res.status(200).send(Application);
 });
 
 router.put("/prohibit/user/:id", [authToken], async (req, res) => {
@@ -318,6 +373,21 @@ router.put(
       .catch(err => res.status(500).send({ error: err.message }));
   }
 );
+
+router.get("/reviews", [authToken], async (req, res) => {
+  const Reviews = await reviews.findAll();
+  res.status(200).send(Reviews);
+});
+
+router.get("/reports", [authToken], async (req, res) => {
+  const Reports = await reports.findAll();
+  res.status(200).send(Reports);
+});
+
+router.get("/testcases", [authToken], async (req, res) => {
+  const testCases = await TestCases.findAll();
+  res.status(200).send(testCases);
+});
 
 router.put("/update/admin/password/:id", [authToken], async (req, res) => {
   if (!req.body) return res.status(400).send({ message: "Bad Request" });
