@@ -224,6 +224,7 @@ router.get("/user/:userId", [authToken], async (req, res) => {
   if (!user) return res.status(404).send({ message: "Not found" });
 
   const result = await _.pick(user, [
+    "id",
     "username",
     "email",
     "number",
@@ -306,6 +307,13 @@ router.put("/prohibit/user/:id", [authToken], async (req, res) => {
       notes: User.notes
     });
 
+  const hasApplied = await application.findOne({
+    where: { userId: req.params.id }
+  });
+  if (hasApplied) {
+    await application.destroy({ where: { userId: req.params.id } });
+  }
+
   await users
     .update(
       { status: "prohibited", notes: req.body.prohibitedReason },
@@ -346,7 +354,7 @@ router.put("/prohibit/contractor/:id", [authToken], async (req, res) => {
 
   await contractors
     .update(
-      { status: "prohibited", notes: req.body.notes },
+      { status: "prohibited", notes: req.body.prohibitedReason },
       { where: { id: req.params.id } }
     )
     .then(() => res.status(200).send({ message: "success" }))
@@ -368,7 +376,10 @@ router.put(
       return res.status(400).send({ message: "Contractor already active" });
 
     await contractors
-      .update({ status: "active" }, { where: { id: req.params.id } })
+      .update(
+        { status: "active", notes: req.body.activationReason },
+        { where: { id: req.params.id } }
+      )
       .then(() => res.status(200).send({ message: "success" }))
       .catch(err => res.status(500).send({ error: err.message }));
   }
