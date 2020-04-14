@@ -253,6 +253,7 @@ router.get("/admin/:id", [authToken], async (req, res) => {
     "name",
     "email",
     "role",
+    "notes",
     "phone",
     "status",
     "createdAt",
@@ -390,6 +391,19 @@ router.get("/reviews", [authToken], async (req, res) => {
   res.status(200).send(Reviews);
 });
 
+router.delete("/review/:reviewId", [authToken], async (req, res) => {
+  if (!req.params.reviewId)
+    return res.status(400).send({ message: "Bad Request" });
+
+  const review = await reviews.findOne({ where: { id: req.params.reviewId } });
+  if (!review) return res.status(404).send({ message: "Not found" });
+
+  await reviews
+    .destroy({ where: { id: req.params.reviewId } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
+});
+
 router.get("/reports", [authToken], async (req, res) => {
   const Reports = await reports.findAll();
   res.status(200).send(Reports);
@@ -438,30 +452,14 @@ router.put(
       return res.status(400).send({ message: `Admin already ${admin.status}` });
 
     await admins
-      .update({ status: "deactivated" }, { where: { id: req.params.id } })
-      .then(() =>
-        res.status(200).send({ message: "success", nextStep: "login" })
+      .update(
+        { status: "deactivated", notes: req.body.reason },
+        { where: { id: req.params.id } }
       )
+      .then(() => res.status(200).send({ message: "success" }))
       .catch(err => res.status(500).send({ error: err.message }));
   }
 );
-
-router.put("/prohibit/admin/:id", [authToken, superAdmin], async (req, res) => {
-  if (!req.body) return res.status(400).send({ message: "Bad Request" });
-
-  const admin = await admins.findOne({ where: { id: req.params.id } });
-  if (!admin) return res.status(404).send({ message: "Not found" });
-
-  if (admin.status !== "active")
-    return res
-      .status(400)
-      .send({ message: `Admin account already ${admin.status}` });
-
-  await admins
-    .update({ status: "prohibited" }, { where: { id: req.params.id } })
-    .then(() => res.status(200).send({ message: "success" }))
-    .catch(err => res.status(500).send({ error: err.message }));
-});
 
 router.put("/activate/admin/:id", [authToken, superAdmin], async (req, res) => {
   if (!req.body) return res.status(400).send({ message: "Bad Request" });
@@ -490,16 +488,20 @@ router.put("/handle/report/:id", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put("/update/admin/:adminId", [authToken], async (req, res) => {
-  if (!req.body) return res.status(400).send({ message: "Bad Request" });
+router.put(
+  "/update/admin/:adminId",
+  [authToken, superAdmin],
+  async (req, res) => {
+    if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
-  const admin = await admins.findOne({ where: { id: req.params.adminId } });
-  if (!admin) return res.status(404).send({ message: "Not found" });
+    const admin = await admins.findOne({ where: { id: req.params.adminId } });
+    if (!admin) return res.status(404).send({ message: "Not found" });
 
-  await admins
-    .update(req.body, { where: { id: req.params.adminId } })
-    .then(() => res.status(200).send({ message: "success" }))
-    .catch(err => res.status(500).send({ error: err.messgae }));
-});
+    await admins
+      .update(req.body, { where: { id: req.params.adminId } })
+      .then(() => res.status(200).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err.messgae }));
+  }
+);
 
 module.exports = router;
