@@ -152,6 +152,26 @@ router.post("/approve/application/:id", [authToken], async (req, res) => {
   res.status(200).send({ message: "success", result });
 });
 
+router.put(
+  "/update/application/:applicationId",
+  [authToken],
+  async (req, res) => {
+    if (!req.params.applicationId || !req.body) {
+      return res.status(400).send({ message: "Bad Request" });
+    }
+
+    const appli = await application.findOne({
+      where: { id: req.params.applicationId }
+    });
+    if (!appli) return res.status(404).send({ message: "Not found" });
+
+    await application
+      .update(req.body, { where: { id: req.params.applicationId } })
+      .then(() => res.status(200).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err.message }));
+  }
+);
+
 router.post("/reject/application/:id", [authToken], async (req, res) => {
   if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
