@@ -23,50 +23,6 @@ generateAuthToken = admin => {
   return token;
 };
 
-router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
-  if (!req.body) return res.status(400).send({ message: "Bad Request" });
-
-  const admin = await admins.findOne({
-    where: { email: req.body.email }
-  });
-  if (admin) return res.status(302).send({ message: "Admin already exsits" });
-
-  const isContractor = await contractors.findOne({
-    where: { email: req.body.email }
-  });
-  if (isContractor)
-    return res.status(302).send({
-      message: "Email already registered as contractor",
-      contractor: isContractor
-    });
-
-  const salt = await bcrypt.genSalt(10);
-  req.body.password = await bcrypt.hash(req.body.password, salt);
-
-  await admins
-    .create({
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      password: req.body.password,
-      role: req.body.role,
-      status: "active"
-    })
-    .then(async admin => {
-      const result = await _.pick(admin, [
-        "id",
-        "name",
-        "email",
-        "phone",
-        "role",
-        "status"
-      ]);
-
-      res.status(201).send({ message: "success", nextStep: "login", result });
-    })
-    .catch(err => res.status(500).send({ error: err.message }));
-});
-
 router.post("/auth/login", async (req, res) => {
   if (!req.body.email || !req.body.password)
     return res.status(400).send({ message: "Bad Request" });
@@ -99,6 +55,120 @@ router.post("/auth/login", async (req, res) => {
     .status(200)
     .header("Authorization", token)
     .send({ message: "success", Admin, token });
+});
+
+router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
+
+  const admin = await admins.findOne({
+    where: { email: req.body.email }
+  });
+  if (admin) return res.status(302).send({ message: "Admin already exsits" });
+
+  const isContractor = await contractors.findOne({
+    where: { email: req.body.email },
+    attributes: {
+      exclude: [
+        "password",
+        "gender",
+        "location",
+        "timeIn",
+        "timeOut",
+        "category",
+        "profileImage",
+        "identity",
+        "nonCriminal",
+        "rating",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  });
+  if (isContractor)
+    return res.status(302).send({
+      message: "Email already registered as contractor",
+      contractor: isContractor
+    });
+
+  const salt = await bcrypt.genSalt(10);
+  const loginPassword = await bcrypt.hash("123123", salt);
+
+  await admins
+    .create({
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      notes: req.body.notes,
+      password: loginPassword,
+      role: req.body.role,
+      status: "active"
+    })
+    .then(async admin => {
+      const result = await _.pick(admin, [
+        "id",
+        "name",
+        "email",
+        "phone",
+        "notes",
+        "role",
+        "status"
+      ]);
+
+      res.status(201).send({ message: "success", result });
+    })
+    .catch(err => res.status(500).send({ error: err.message }));
+});
+
+router.post("/create/contractor", [authToken, superAdmin], async (req, res) => {
+  if (!req.body) return res.status(404).send({ message: "Bad Request" });
+
+  const isAdmin = await admins.findOne({ where: { email: req.body.email } });
+  if (isAdmin)
+    return res.status(302).send({ message: "Already exsits as Admin" });
+
+  const isContractor = await contractors.findOne({
+    where: { email: req.body.email }
+  });
+  if (isContractor)
+    return res.status(302).send({ message: "Already exsits as Contractor" });
+
+  const isUser = await users.findOne({ where: { number: req.body.number } });
+  if (isUser && isUser.status !== "active") {
+    return res.status(400).send({
+      message: `Already exsits as User and status is ${isUser.status}`
+    });
+  }
+  if (isUser && isUser.applicationStatus !== "new") {
+    return res.status(400).send({
+      message: `Already exsits as User and application is ${isUser.applicationStatus}`
+    });
+  }
+
+  if (isUser) await users.destroy({ where: { id: isUser.id } });
+
+  const salt = await bcrypt.genSalt(10);
+  const loginPassword = await bcrypt.hash("123123", salt);
+
+  await contractors
+    .create({
+      name: req.body.name,
+      email: req.body.email,
+      number: req.body.number,
+      gender: req.body.gender,
+      password: loginPassword,
+      location: req.body.location,
+      timeIn: req.body.timeIn,
+      timeOut: req.body.timeOut,
+      category: req.body.category,
+      profileImage: "",
+      identity: "",
+      nonCriminal: "",
+      status: "active",
+      notes: req.body.notes
+    })
+    .then(() => res.status(201).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err }));
 });
 
 router.post("/approve/application/:id", [authToken], async (req, res) => {

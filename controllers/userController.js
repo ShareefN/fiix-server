@@ -63,7 +63,8 @@ router.post("/user/register", async (req, res) => {
       email: req.body.email,
       password: req.body.password,
       number: req.body.number,
-      status: "active"
+      status: "active",
+      applicationStatus: 'new'
     })
     .then(async user => {
       const token = await generateAuthToken(user);
