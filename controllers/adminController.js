@@ -12,8 +12,7 @@ const {
   admins,
   application,
   reports,
-  reviews,
-  TestCases
+  reviews
 } = require("../models");
 
 generateAuthToken = admin => {
@@ -525,16 +524,6 @@ router.delete("/review/:reviewId", [authToken], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.get("/reports", [authToken], async (req, res) => {
-  const Reports = await reports.findAll();
-  res.status(200).send(Reports);
-});
-
-router.get("/testcases", [authToken], async (req, res) => {
-  const testCases = await TestCases.findAll();
-  res.status(200).send(testCases);
-});
-
 router.put("/update/admin/password/:id", [authToken], async (req, res) => {
   if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
@@ -597,18 +586,6 @@ router.put("/activate/admin/:id", [authToken, superAdmin], async (req, res) => {
     .catch(err => res.status(500).send({ error: err.message }));
 });
 
-router.put("/handle/report/:id", [authToken], async (req, res) => {
-  if (!req.body) return res.status(400).send({ message: "Bad Request" });
-
-  const isFound = await reports.findOne({ where: { id: req.params.id } });
-  if (!isFound) return res.status(404).send({ message: "Not found" });
-
-  await reports
-    .update({ notes: req.body.note }, { where: { id: req.params.id } })
-    .then(() => res.status(200).send({ message: "success" }))
-    .catch(err => res.status(500).send({ error: err.message }));
-});
-
 router.put(
   "/update/admin/:adminId",
   [authToken, superAdmin],
@@ -641,6 +618,53 @@ router.put(
       .update(req.body, {
         where: { id: req.params.contractorId }
       })
+      .then(() => res.status(200).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err.message }));
+  }
+);
+
+router.get("/reports", [authToken], async (req, res) => {
+  const Reports = await reports.findAll();
+  res.status(200).send(Reports);
+});
+
+router.get("/report/:reportId", [authToken], async (req, res) => {
+  if (!req.params.reportId)
+    return res.status(404).send({ message: "Not found" });
+
+  const report = await reports.findOne({ where: { id: req.params.reportId } });
+  if (!report) return res.status(400).send({ message: "Not found" });
+
+  res.status(200).send(report);
+});
+
+router.put(
+  "/update/report/:reportId/admin/:adminId",
+  [authToken],
+  async (req, res) => {
+    if (!req.params.reportId || !req.params.adminId || !req.body)
+      return res.status(400).send({ message: "Bad Request" });
+
+    const report = await reports.findOne({
+      where: { id: req.params.reportId }
+    });
+    if (!report) return res.status(404).send({ message: "Not Found" });
+
+    const admin = await admins.findOne({ where: { id: req.params.adminId } });
+    if (!admin)
+      return res
+        .status(404)
+        .send({ message: "Bad Request, Admin id was not sent" });
+
+    await reports
+      .update(
+        {
+          status: req.body.status,
+          notes: req.body.notes,
+          adminName: admin.name
+        },
+        { where: { id: req.params.reportId } }
+      )
       .then(() => res.status(200).send({ message: "success" }))
       .catch(err => res.status(500).send({ error: err.message }));
   }

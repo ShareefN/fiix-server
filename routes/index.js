@@ -4,11 +4,9 @@ const {
   admins,
   application,
   contractors,
-  report,
   categories,
   review,
   forgotPassword,
-  testCases,
   statistics,
   userApp
 } = require("../controllers");
@@ -37,17 +35,11 @@ module.exports = app => {
   // CONTRACTORS ROUTES
   app.use("/auth", contractors);
 
-  // REPORT ROUTES
-  app.use("/send", report);
-
   // CATEGORIES ROUTES
   app.use("/categories", categories);
 
   // REVIEWS ROUTES
   app.use("/reviews", review);
-
-  // TEST CASES ROUTES
-  app.use("/testing", testCases);
 
   // STATS ROUTES
   app.use("/statistics", statistics);

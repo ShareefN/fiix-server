@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const authToken = require("../middleware/authenticate");
 const _ = require("lodash");
-const { contractors, users } = require("../models");
+const { contractors, users, reports } = require("../models");
 
 generateAuthToken = admin => {
   const token = jwt.sign({ admin }, config.get("jwtPrivateKey"));
@@ -64,7 +64,7 @@ router.post("/user/register", async (req, res) => {
       password: req.body.password,
       number: req.body.number,
       status: "active",
-      applicationStatus: 'new'
+      applicationStatus: "new"
     })
     .then(async user => {
       const token = await generateAuthToken(user);
@@ -187,6 +187,25 @@ router.post("/forgot/password", async (req, res) => {
   if (!user) return res.status(404).send({ message: "Not found" });
 
   // send email to user with input to enter new password
+});
+
+router.post("/report/:useId", [authToken], async (req, res) => {
+  if (!req.body.report) return res.status(404).send({ message: "Bad Request" });
+
+  const user = await users.findOne({ where: { id: req.params.useId } });
+  if (!user) return res.status(404).send({ message: "Not found" });
+
+  const report = {
+    userId: user.id,
+    username: user.username,
+    number: user.number,
+    report: req.body.report
+  };
+
+  await reports
+    .create(report)
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.messgae }));
 });
 
 module.exports = router;
