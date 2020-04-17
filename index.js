@@ -36,6 +36,6 @@ require("./config/prod")(app);
 
 db.sequelize.sync({}).then(function() {
   app.listen(port, function() {
-    console.log("Listening on localhost:" + port);
+    console.log("Listening on port:" + port);
   });
 });
