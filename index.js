@@ -4,8 +4,6 @@ const config = require("config");
 const port = process.env.PORT || 3030;
 const db = require("./models");
 var cors = require("cors");
-const helmet = require("helmet");
-const compression = require("compression");
 const bodyParser = require("body-parser");
 
 const app = express();
@@ -26,8 +24,6 @@ if (!config.get("jwtPrivateKey")) {
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(helmet());
-app.use(compression());
 
 app.use(function(req, res, next) {
   res.header("Content-Type: application/json");
@@ -36,6 +32,7 @@ app.use(function(req, res, next) {
 });
 
 require("./routes/index")(app);
+require("./config/prod")(app);
 
 db.sequelize.sync({}).then(function() {
   app.listen(port, function() {
