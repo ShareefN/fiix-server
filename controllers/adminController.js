@@ -115,7 +115,7 @@ router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
         "status"
       ]);
 
-      res.status(201).send({ message: "success", result });
+      res.status(200).send({ message: "success", result });
     })
     .catch(err => res.status(500).send({ error: err.message }));
 });
@@ -167,8 +167,39 @@ router.post("/create/contractor", [authToken, superAdmin], async (req, res) => {
       status: "active",
       notes: req.body.notes
     })
-    .then(() => res.status(201).send({ message: "success" }))
+    .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err }));
+});
+
+router.post("/create/user", [authToken], async (req, res) => {
+  if (!req.body) return res.status(404).send({ message: "Bad Request" });
+
+  const user = await users.findOne({ where: { email: req.body.email } });
+  if (user) return res.status(302).send({ message: "User already exsists" });
+
+  const isContractor = await contractors.findOne({
+    where: { email: req.body.email }
+  });
+  if (isContractor)
+    return res
+      .status(302)
+      .send({ message: "Already registered as a Contractor" });
+
+  const salt = await bcrypt.genSalt(10);
+  const loginPassword = await bcrypt.hash("123123", salt);
+
+  await users
+    .create({
+      username: req.body.username,
+      email: req.body.email,
+      number: req.body.number,
+      password: loginPassword,
+      status: "active",
+      applicationStatus: "new",
+      notes: req.body.notes
+    })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
 });
 
 router.post("/approve/application/:id", [authToken], async (req, res) => {
@@ -591,6 +622,27 @@ router.put(
       .update(req.body, { where: { id: req.params.adminId } })
       .then(() => res.status(200).send({ message: "success" }))
       .catch(err => res.status(500).send({ error: err.messgae }));
+  }
+);
+
+router.put(
+  "/update/contractor/:contractorId",
+  [authToken, superAdmin],
+  async (req, res) => {
+    if (!req.params.contractorId)
+      return res.status(400).send({ message: "Bad Request" });
+
+    const contractor = await contractors.findOne({
+      where: { id: req.params.contractorId }
+    });
+    if (!contractor) return res.status(404).send({ message: "Not found" });
+
+    await contractors
+      .update(req.body, {
+        where: { id: req.params.contractorId }
+      })
+      .then(() => res.status(200).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err.message }));
   }
 );
 
