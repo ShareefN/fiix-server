@@ -56,7 +56,7 @@ router.post("/auth/login", async (req, res) => {
     .send({ message: "success", Admin, token });
 });
 
-router.post("/create/admin", [authToken, superAdmin], async (req, res) => {
+router.post("/create/admin", async (req, res) => {
   if (!req.body) return res.status(400).send({ message: "Bad Request" });
 
   const admin = await admins.findOne({
