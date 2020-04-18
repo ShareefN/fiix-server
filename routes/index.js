@@ -8,7 +8,8 @@ const {
   review,
   forgotPassword,
   statistics,
-  userApp
+  userApp,
+  postman
 } = require("../controllers");
 
 module.exports = app => {
@@ -46,4 +47,7 @@ module.exports = app => {
 
   // FORGOT PASSWORD
   app.use("/reset", forgotPassword);
+  
+  // POSTMAN ROUTES
+  app.use("/postman", postman);
 };
