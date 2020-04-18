@@ -35,6 +35,7 @@ require("./routes/index")(app);
 require("./config/prod")(app);
 
 db.sequelize.sync({}).then(function() {
+  db.sequelize.connect();
   app.listen(port, function() {
     console.log("Listening on port:" + port);
   });
