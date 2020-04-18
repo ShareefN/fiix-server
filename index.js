@@ -4,6 +4,7 @@ const config = require("config");
 const port = process.env.PORT || 3030;
 const db = require("./models");
 var cors = require("cors");
+const http = require("http");
 const bodyParser = require("body-parser");
 
 const app = express();
@@ -34,8 +35,14 @@ app.use(function(req, res, next) {
 require("./routes/index")(app);
 require("./config/prod")(app);
 
-db.sequelize.sync({}).then(function() {
-  app.listen(port, function() {
+// db.sequelize.sync({}).then(function() {
+//   app.listen(port, function() {
+//     console.log("Listening on port:" + port);
+//   });
+// });
+
+db.sequelize.sync().then(function() {
+  http.createServer(app).listen(port, function() {
     console.log("Listening on port:" + port);
   });
 });
