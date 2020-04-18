@@ -14,7 +14,7 @@ router.post("/apply/:id", [authToken], async (req, res) => {
       notes: user.notes
     });
 
-  if (user.applicationStatus !== null)
+  if (user.applicationStatus !== 'new')
     return res.status(403).send({
       message: `User already ${user.applicationStatus}`,
       status: user.status,
