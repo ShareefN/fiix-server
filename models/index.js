@@ -13,9 +13,11 @@ const db = {};
 
 let sequelize;
 if (config.use_env_variable) {
-  console.log(process.env[config.use_env_variable], config)
+  console.log("should be dyno db");
+  console.log(process.env[config.use_env_variable], config);
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
+  console.log("this is the local");
   sequelize = new Sequelize(
     config.database,
     config.username,
