@@ -34,7 +34,7 @@ module.exports = app => {
   app.use("/application", application);
 
   // CONTRACTORS ROUTES
-  app.use("/auth", contractors);
+  app.use("/contractors", contractors);
 
   // CATEGORIES ROUTES
   app.use("/categories", categories);

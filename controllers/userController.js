@@ -21,25 +21,6 @@ router.post("/user/mobile", async (req, res) => {
       notes: isFound.notes
     });
 
-  await nexmo.verify.request(
-    {
-      number: `962${req.body.number}`,
-      brand: "FiiX Verificatione Code"
-    },
-    (err, result) => {
-      if (err) {
-        return res.status(500).send({ error: err.message });
-      } else {
-        const verifyRequestId = result.request_id;
-        console.log("request_id", verifyRequestId);
-      }
-    }
-  );
-  // handle sms otp verification for found or not found cases
-
-  // if found and verified, generate token and send to dashboard
-
-  // if not found and verified, send to signup...
 });
 
 router.post("/user/register", async (req, res) => {
