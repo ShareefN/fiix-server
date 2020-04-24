@@ -41,14 +41,6 @@ router.post("/contractor/login", async (req, res) => {
     "id",
     "name",
     "number",
-    "email",
-    "location",
-    "timeIn",
-    "timeOut",
-    "profileImage",
-    "identity",
-    "nonCriminal",
-    "rating",
     "status"
   ]);
 
