@@ -63,7 +63,7 @@ router.post("/user/register", async (req, res) => {
         .send({ message: "success", User, token });
     })
     .catch(error => {
-      res.status(500).send({ error: error.message });
+      res.status(500).send({ error: error });
     });
 });
 
