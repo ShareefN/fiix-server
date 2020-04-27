@@ -185,4 +185,24 @@ router.get("/reviews", [authToken], async (req, res) => {
   res.status(200).send(Reviews);
 });
 
+router.post("/review/user/:userId", [authToken], async (req, res) => {
+  if (!req.params.userId || !req.body.review)
+    return res.status(400).send({ message: "Bad Request" });
+
+  const user = await users.findOne({ where: { id: req.params.userId } });
+  if (!user) return res.status(404).send({ message: "Not found" });
+
+  const review = {
+    userId: user.id,
+    username: user.username,
+    number: user.number,
+    review: req.body.review,
+  };
+
+  await reviews
+    .create(review)
+    .then(() => res.status(201).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.message }));
+});
+
 module.exports = router;
