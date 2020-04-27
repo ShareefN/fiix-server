@@ -180,7 +180,7 @@ router.post("/report/:userId", [authToken], async (req, res) => {
 
 router.get("/reviews", [authToken], async (req, res) => {
   const Reviews = await reviews.findAll({
-    attributes: { exclude: ["likes", "userIds"] }
+    attributes: { exclude: ["likes", "userIds", "number", "updatedAt"] }
   });
   res.status(200).send(Reviews);
 });
