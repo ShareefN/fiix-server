@@ -5,23 +5,12 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const authToken = require("../middleware/authenticate");
 const _ = require("lodash");
-const { contractors, users, reports } = require("../models");
+const { contractors, users, reports, reviews } = require("../models");
 
 generateAuthToken = admin => {
   const token = jwt.sign({ admin }, config.get("jwtPrivateKey"));
   return token;
 };
-
-router.post("/user/mobile", async (req, res) => {
-  const isFound = await users.findOne({ where: { number: req.body.number } });
-
-  if (isFound && isFound.status !== "active")
-    return res.status(403).send({
-      message: `User account ${isFound.status}`,
-      notes: isFound.notes
-    });
-
-});
 
 router.post("/user/register", async (req, res) => {
   if (!req.body) return res.status(400).send({ message: "Bad Request" });
@@ -170,10 +159,10 @@ router.post("/forgot/password", async (req, res) => {
   // send email to user with input to enter new password
 });
 
-router.post("/report/:useId", [authToken], async (req, res) => {
+router.post("/report/:userId", [authToken], async (req, res) => {
   if (!req.body.report) return res.status(404).send({ message: "Bad Request" });
 
-  const user = await users.findOne({ where: { id: req.params.useId } });
+  const user = await users.findOne({ where: { id: req.params.userId } });
   if (!user) return res.status(404).send({ message: "Not found" });
 
   const report = {
@@ -187,6 +176,13 @@ router.post("/report/:useId", [authToken], async (req, res) => {
     .create(report)
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.messgae }));
+});
+
+router.get("/reviews", [authToken], async (req, res) => {
+  const Reviews = await reviews.findAll({
+    attributes: { exclude: ["likes", "userIds"] }
+  });
+  res.status(200).send(Reviews);
 });
 
 module.exports = router;
