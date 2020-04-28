@@ -215,7 +215,7 @@ router.delete(
     const review = await reviews.findOne({ where: { id: req.params.reviewId } });
     if (!review) return res.status(404).send({ message: "Review Not found" });
 
-    if (review.userId !== req.params.userId)
+    if (review.userId != req.params.userId)
       return res.status(404).send({ message: "Action denied" });
 
     await reviews
