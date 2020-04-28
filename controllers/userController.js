@@ -196,7 +196,7 @@ router.post("/review/user/:userId", [authToken], async (req, res) => {
     userId: user.id,
     username: user.username,
     number: user.number,
-    review: req.body.review,
+    review: req.body.review
   };
 
   await reviews
@@ -204,5 +204,25 @@ router.post("/review/user/:userId", [authToken], async (req, res) => {
     .then(() => res.status(201).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
+
+router.delete(
+  "/review/:reviewId/user/:userId",
+  [authToken],
+  async (req, res) => {
+    if (!req.params.reviewId || !req.params.userId)
+      return res.status(400).send({ message: "Bad Request" });
+
+    const review = await reviews.findOne({ where: { id: req.params.reviewId } });
+    if (!review) return res.status(404).send({ message: "Review Not found" });
+
+    if (review.userId !== req.params.userId)
+      return res.status(404).send({ message: "Action denied" });
+
+    await reviews
+      .destroy({ where: { id: req.params.reviewId } })
+      .then(() => res.status(201).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err }));
+  }
+);
 
 module.exports = router;
