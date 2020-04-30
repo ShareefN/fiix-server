@@ -233,8 +233,20 @@ router.get("/contractors/:category", [authToken], async (req, res) => {
     return res.status(400).send({ message: "Bad Request" });
 
   const list = await contractors.findAll({
-    where: { category: req.params.category, status: 'active' },
-    attributes: { exclude: ["password", "identity", "nonCriminal", "notes", "updatedAt"] }
+    where: { category: req.params.category, status: "active" },
+    attributes: {
+      exclude: [
+        "password",
+        "identity",
+        "nonCriminal",
+        "notes",
+        "updatedAt",
+        "email",
+        "number",
+        "gender",
+        "createdAt"
+      ]
+    }
   });
 
   res.status(200).send(list);
