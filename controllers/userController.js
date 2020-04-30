@@ -182,6 +182,7 @@ router.get("/reviews", [authToken], async (req, res) => {
   const Reviews = await reviews.findAll({
     attributes: { exclude: ["likes", "userIds", "number", "updatedAt"] }
   });
+
   res.status(200).send(Reviews);
 });
 
@@ -212,7 +213,9 @@ router.delete(
     if (!req.params.reviewId || !req.params.userId)
       return res.status(400).send({ message: "Bad Request" });
 
-    const review = await reviews.findOne({ where: { id: req.params.reviewId } });
+    const review = await reviews.findOne({
+      where: { id: req.params.reviewId }
+    });
     if (!review) return res.status(404).send({ message: "Review Not found" });
 
     if (review.userId != req.params.userId)
@@ -224,5 +227,17 @@ router.delete(
       .catch(err => res.status(500).send({ error: err }));
   }
 );
+
+router.get("/contractors/:category", [authToken], async (req, res) => {
+  if (!req.params.category)
+    return res.status(400).send({ message: "Bad Request" });
+
+  const list = await contractors.findAll({
+    where: { category: req.params.category, status: 'active' },
+    attributes: { exclude: ["password", "identity", "nonCriminal", "notes", "updatedAt"] }
+  });
+
+  res.status(200).send(list);
+});
 
 module.exports = router;
