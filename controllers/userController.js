@@ -5,7 +5,13 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const authToken = require("../middleware/authenticate");
 const _ = require("lodash");
-const { contractors, users, reports, reviews } = require("../models");
+const {
+  contractors,
+  users,
+  reports,
+  reviews,
+  contractorReviews
+} = require("../models");
 
 generateAuthToken = admin => {
   const token = jwt.sign({ admin }, config.get("jwtPrivateKey"));
@@ -276,6 +282,63 @@ router.get("/contractor/:contractorId", [authToken], async (req, res) => {
   if (!contractor) return res.status(404).send({ message: "Not found" });
 
   res.status(200).send(contractor);
+});
+
+router.get("/contractor/:contractorId/reviews", authToken, async (req, res) => {
+  if (!req.params.contractorId)
+    return res.status(400).send({ message: "Bad request" });
+
+  const reviews = await contractorReviews.findAll({
+    where: { contractorId: req.params.contractorId }
+  });
+
+  res.status(200).send(reviews);
+});
+
+router.post(
+  "/contractor/:contractorId/user/:userId/review",
+  [authToken],
+  async (req, res) => {
+    if (!req.params.contractorId || !req.params.userId || !req.body.review)
+      return res.status(400).send({ message: "Bad request" });
+
+    const contractor = await contractors.findOne({
+      where: { id: req.params.contractorId }
+    });
+    if (!contractor)
+      return res.status(404).send({ message: "Invalid contractor Id" });
+
+    const user = await users.findOne({ where: { id: req.params.userId } });
+    if (!user) return res.status(404).send({ message: "Invalid user id" });
+
+    await contractorReviews
+      .create({
+        contractorId: contractor.id,
+        userId: user.id,
+        username: user.username,
+        review: req.body.review
+      })
+      .then(() => res.status(201).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err }));
+  }
+);
+
+router.delete("/contractorsreview/:reviewId/user/:userId", authToken, async (req, res) => {
+  if (!req.params.reviewId || !req.params.userId)
+    return res.status(400).send({ message: "Bad request" });
+
+  const review = await contractorReviews.findOne({
+    where: { id: req.params.reviewId }
+  });
+  if (!review) return res.status(404).send({ message: "Invalid review Id" });
+
+  if (review.userId != req.params.userId)
+    return res.status(400).send({ message: "Actions denied" });
+
+  await contractorReviews
+    .destroy({ where: { id: req.params.reviewId } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err }));
 });
 
 module.exports = router;
