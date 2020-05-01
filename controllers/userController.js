@@ -266,6 +266,7 @@ router.get("/contractor/:contractorId", [authToken], async (req, res) => {
     where: { id: req.params.contractorId },
     attributes: {
       exclude: [
+        "gender",
         "email",
         "password",
         "identity",
