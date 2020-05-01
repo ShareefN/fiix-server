@@ -202,7 +202,8 @@ router.post("/create/user", [authToken], async (req, res) => {
 });
 
 router.post("/approve/application/:id", [authToken], async (req, res) => {
-  if (!req.body) return res.status(400).send({ message: "Bad Request" });
+  if (!req.body || !req.params.id)
+    return res.status(400).send({ message: "Bad Request" });
 
   const applicant = await application.findOne({ where: { id: req.params.id } });
   if (!applicant)
@@ -220,7 +221,22 @@ router.post("/approve/application/:id", [authToken], async (req, res) => {
   }
 
   await contractors
-    .create(applicant.dataValues)
+    .create({
+      name: applicant.name,
+      email: applicant.email,
+      number: applicant.number,
+      gender: applicant.gender,
+      password: applicant.password,
+      location: applicant.location,
+      timeIn: applicant.timeIn,
+      timeOut: applicant.timeOut,
+      category: applicant.category,
+      profileImage: "",
+      identity: "",
+      nonCriminal: "",
+      status: "active",
+      notes: req.body.notes
+    })
     .then(() => res.status(200))
     .catch(error => res.status(500).send({ error: error.message }));
 
@@ -234,7 +250,7 @@ router.post("/approve/application/:id", [authToken], async (req, res) => {
     .then(() => res.status(200))
     .catch(error => res.status(500).send({ error: error }));
 
-  const result = _.pick(applicant, [
+  const result = await _.pick(applicant, [
     "name",
     "email",
     "number",

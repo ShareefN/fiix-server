@@ -10,7 +10,8 @@ const {
   users,
   reports,
   reviews,
-  contractorReviews
+  contractorReviews,
+  application
 } = require("../models");
 
 generateAuthToken = admin => {
@@ -323,22 +324,26 @@ router.post(
   }
 );
 
-router.delete("/contractorsreview/:reviewId/user/:userId", authToken, async (req, res) => {
-  if (!req.params.reviewId || !req.params.userId)
-    return res.status(400).send({ message: "Bad request" });
+router.delete(
+  "/contractorsreview/:reviewId/user/:userId",
+  authToken,
+  async (req, res) => {
+    if (!req.params.reviewId || !req.params.userId)
+      return res.status(400).send({ message: "Bad request" });
 
-  const review = await contractorReviews.findOne({
-    where: { id: req.params.reviewId }
-  });
-  if (!review) return res.status(404).send({ message: "Invalid review Id" });
+    const review = await contractorReviews.findOne({
+      where: { id: req.params.reviewId }
+    });
+    if (!review) return res.status(404).send({ message: "Invalid review Id" });
 
-  if (review.userId != req.params.userId)
-    return res.status(400).send({ message: "Actions denied" });
+    if (review.userId != req.params.userId)
+      return res.status(400).send({ message: "Action denied" });
 
-  await contractorReviews
-    .destroy({ where: { id: req.params.reviewId } })
-    .then(() => res.status(200).send({ message: "success" }))
-    .catch(err => res.status(500).send({ error: err }));
-});
+    await contractorReviews
+      .destroy({ where: { id: req.params.reviewId } })
+      .then(() => res.status(200).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err }));
+  }
+);
 
 module.exports = router;
