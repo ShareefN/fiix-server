@@ -702,13 +702,25 @@ router.get(
   }
 );
 
-router.delete("/contractor/review/:reviewId", [authToken], async (req, res) => {
-  if (!req.params.reviewId)
-    return res.status(400).send({ message: "Bad request" });
+router.delete(
+  "/contractor/:contractorId/review/:reviewId",
+  [authToken],
+  async (req, res) => {
+    if (!req.params.reviewId || !req.params.contractorId)
+      return res.status(400).send({ message: "Bad request" });
 
-  await contractorReviews.destroy({ where: { id: req.params.reviewId } });
+    const review = await contractorReviews.findOne({
+      where: { id: req.params.reviewId }
+    });
+    if (!review) return res.status(404).send({ message: "Review not found" });
 
-  return res.status(200).send({ message: "success" });
-});
+    if (review.contractorId !== req.params.contractorId)
+      return res.status(404).send({ message: "Action denied" });
+
+    await contractorReviews.destroy({ where: { id: req.params.reviewId } });
+
+    return res.status(200).send({ message: "success" });
+  }
+);
 
 module.exports = router;
