@@ -714,7 +714,7 @@ router.delete(
     });
     if (!review) return res.status(404).send({ message: "Review not found" });
 
-    if (review.contractorId !== req.params.contractorId)
+    if (review.contractorId != req.params.contractorId)
       return res.status(404).send({ message: "Action denied" });
 
     await contractorReviews.destroy({ where: { id: req.params.reviewId } });
