@@ -10,8 +10,7 @@ const {
   users,
   reports,
   reviews,
-  contractorReviews,
-  application
+  contractorReviews
 } = require("../models");
 
 generateAuthToken = admin => {

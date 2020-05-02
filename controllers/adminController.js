@@ -12,7 +12,8 @@ const {
   admins,
   application,
   reports,
-  reviews
+  reviews,
+  contractorReviews
 } = require("../models");
 
 generateAuthToken = admin => {
@@ -685,5 +686,29 @@ router.put(
       .catch(err => res.status(500).send({ error: err.message }));
   }
 );
+
+router.get(
+  "/contractor/:contractorId/reviews",
+  [authToken],
+  async (req, res) => {
+    if (!req.params.contractorId)
+      return res.status(400).send({ message: "Bad request" });
+
+    const reviews = await contractorReviews.findAll({
+      where: { contractorId: req.params.contractorId }
+    });
+
+    return res.status(200).send(reviews);
+  }
+);
+
+router.delete("/contractor/review/:reviewId", [authToken], async (req, res) => {
+  if (!req.params.reviewId)
+    return res.status(400).send({ message: "Bad request" });
+
+  await contractorReviews.destroy({ where: { id: req.params.reviewId } });
+
+  return res.status(200).send({ message: "success" });
+});
 
 module.exports = router;
