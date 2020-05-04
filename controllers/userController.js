@@ -110,8 +110,29 @@ router.get("/user/:id", [authToken], async (req, res) => {
 });
 
 router.put("/update/user/:id", [authToken], async (req, res) => {
+  if (!req.body) return res.status(400).send({ message: "Bad Request" });
+
   const user = await users.findOne({ where: { id: req.params.id } });
   if (!user) return res.status(404).send({ error: "User not found" });
+
+  if (req.body.username) {
+    const user = await users.findOne({
+      where: { username: req.body.username }
+    });
+    if (user)
+      return res.status(302).send({ message: "Username already taken" });
+  }
+
+  if (req.body.email) {
+    const user = await users.findOne({ where: { email: req.body.email } });
+    if (user) return res.status(302).send({ message: "Email already taken" });
+  }
+
+  if (req.body.number) {
+    const user = await users.findOne({ where: { number: req.body.number } });
+    if (user)
+      return res.status(302).send({ message: "Number already registerd" });
+  }
 
   await users.update(req.body, { where: { id: req.params.id } });
 
