@@ -119,18 +119,18 @@ router.put("/update/user/:id", [authToken], async (req, res) => {
     const user = await users.findOne({
       where: { username: req.body.username }
     });
-    if (user)
+    if (user.id != req.params.id)
       return res.status(302).send({ message: "Username already taken" });
   }
 
   if (req.body.email) {
     const user = await users.findOne({ where: { email: req.body.email } });
-    if (user) return res.status(302).send({ message: "Email already taken" });
+    if (user.id != req.params.id) return res.status(302).send({ message: "Email already taken" });
   }
 
   if (req.body.number) {
     const user = await users.findOne({ where: { number: req.body.number } });
-    if (user)
+    if (user.id != req.params.id)
       return res.status(302).send({ message: "Number already registerd" });
   }
 
