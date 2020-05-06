@@ -10,7 +10,7 @@ const {
   users,
   reports,
   reviews,
-  contractorReviews
+  contractorReviews,
 } = require("../models");
 
 generateAuthToken = admin => {
@@ -165,8 +165,17 @@ router.put("/update/user/password/:id", [authToken], async (req, res) => {
 });
 
 router.put("/deactivate/user/:id", [authToken], async (req, res) => {
+  if(!req.body.password) return res.status(400).send({message: 'Bad request'})
+
   const isFound = await users.findOne({ where: { id: req.params.id } });
   if (!isFound) return res.status(404).send({ message: "User not found" });
+
+  const validatePassword = await bcrypt.compare(
+    req.body.password,
+    isFound.password
+  );
+  if (!validatePassword)
+    return res.status(400).send({ message: "Password is invalid" });
 
   if (isFound.status !== "active")
     return res
@@ -174,7 +183,7 @@ router.put("/deactivate/user/:id", [authToken], async (req, res) => {
       .send({ message: `User account already ${isFound.status}` });
 
   await users
-    .update({ status: "deactivated" }, { where: { id: req.params.id } })
+    .update({ status: "deactivated", notes: 'Deactivated by user' }, { where: { id: req.params.id } })
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
