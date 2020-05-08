@@ -101,6 +101,7 @@ router.get("/user/:id", [authToken], async (req, res) => {
     "username",
     "email",
     "number",
+    "applicationStatus",
     "status",
     "notes",
     "createdAt",
