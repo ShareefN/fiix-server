@@ -471,7 +471,10 @@ router.put("/activate/user/:id", [authToken], async (req, res) => {
     return res.status(400).send({ message: "Account already active" });
 
   await users
-    .update({ status: "active" }, { where: { id: req.params.id } })
+    .update(
+      { status: "active", notes: "Activated by admin" },
+      { where: { id: req.params.id } }
+    )
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
@@ -637,6 +640,29 @@ router.put(
       })
       .then(() => res.status(200).send({ message: "success" }))
       .catch(err => res.status(500).send({ error: err.message }));
+  }
+);
+
+router.put(
+  "/update/user/:userId",
+  [authToken, superAdmin],
+  async (req, res) => {
+    if (!req.params.userId || !req.body)
+      return res.status(400).send({ message: "Bad Request" });
+
+    const user = await users.findOne({ where: { id: req.params.userId } });
+    if (!user) return res.status(404).send({ message: "Not found" });
+
+    await users
+      .update(
+        {
+          applicationStatus: req.body.applicationStatus,
+          notes: req.body.notes
+        },
+        { where: { id: req.params.userId } }
+      )
+      .then(() => res.status(200).send({ message: "success" }))
+      .catch(err => res.status(500).send({ error: err }));
   }
 );
 
