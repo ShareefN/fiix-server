@@ -9,7 +9,8 @@ const {
   forgotPassword,
   statistics,
   userApp,
-  postman
+  postman,
+  reminders
 } = require("../controllers");
 
 module.exports = app => {
@@ -44,6 +45,9 @@ module.exports = app => {
 
   // STATS ROUTES
   app.use("/statistics", statistics);
+
+  // REMINDERS ROUTES
+  app.use('/reminders', reminders);
 
   // FORGOT PASSWORD
   app.use("/reset", forgotPassword);
