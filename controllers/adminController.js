@@ -313,6 +313,7 @@ router.post("/reject/application/:id", [authToken], async (req, res) => {
 
 router.get("/contractors", [authToken], async (req, res) => {
   const Contractors = await contractors.findAll({
+    order: [["createdAt", "DESC"]],
     attributes: {
       exclude: [
         "password",
@@ -348,6 +349,7 @@ router.get("/contractor/:contractorId", [authToken], async (req, res) => {
 
 router.get("/users", [authToken], async (req, res) => {
   const Users = await users.findAll({
+    order: [["createdAt", "DESC"]],
     attributes: { exclude: ["password"] }
   });
   res.status(200).send(Users);
@@ -376,6 +378,7 @@ router.get("/user/:userId", [authToken], async (req, res) => {
 
 router.get("/admins", [authToken], async (req, res) => {
   const Admins = await admins.findAll({
+    order: [["createdAt", "DESC"]],
     attributes: { exclude: ["password"] }
   });
   res.status(200).send(Admins);
@@ -402,6 +405,7 @@ router.get("/admin/:id", [authToken], async (req, res) => {
 
 router.get("/applications", [authToken], async (req, res) => {
   const Applications = await application.findAll({
+    order: [["createdAt", "DESC"]],
     attributes: {
       exclude: [
         "password",
@@ -527,7 +531,7 @@ router.put(
 );
 
 router.get("/reviews", [authToken], async (req, res) => {
-  const Reviews = await reviews.findAll();
+  const Reviews = await reviews.findAll({order: [["createdAt", "DESC"]]});
   res.status(200).send(Reviews);
 });
 
@@ -667,7 +671,7 @@ router.put(
 );
 
 router.get("/reports", [authToken], async (req, res) => {
-  const Reports = await reports.findAll();
+  const Reports = await reports.findAll({order: [["createdAt", "DESC"]]});
   res.status(200).send(Reports);
 });
 
@@ -721,6 +725,7 @@ router.get(
       return res.status(400).send({ message: "Bad request" });
 
     const reviews = await contractorReviews.findAll({
+      order: [["createdAt", "DESC"]],
       where: { contractorId: req.params.contractorId }
     });
 

@@ -10,7 +10,7 @@ const {
   users,
   reports,
   reviews,
-  contractorReviews,
+  contractorReviews
 } = require("../models");
 
 generateAuthToken = admin => {
@@ -126,7 +126,8 @@ router.put("/update/user/:id", [authToken], async (req, res) => {
 
   if (req.body.email) {
     const user = await users.findOne({ where: { email: req.body.email } });
-    if (user && user.id.toString() !== req.params.id) return res.status(302).send({ message: "Email already registerd" });
+    if (user && user.id.toString() !== req.params.id)
+      return res.status(302).send({ message: "Email already registerd" });
   }
 
   if (req.body.number) {
@@ -166,7 +167,8 @@ router.put("/update/user/password/:id", [authToken], async (req, res) => {
 });
 
 router.put("/deactivate/user/:id", [authToken], async (req, res) => {
-  if(!req.body.password) return res.status(400).send({message: 'Bad request'})
+  if (!req.body.password)
+    return res.status(400).send({ message: "Bad request" });
 
   const isFound = await users.findOne({ where: { id: req.params.id } });
   if (!isFound) return res.status(404).send({ message: "User not found" });
@@ -184,7 +186,10 @@ router.put("/deactivate/user/:id", [authToken], async (req, res) => {
       .send({ message: `User account already ${isFound.status}` });
 
   await users
-    .update({ status: "deactivated", notes: 'Deactivated by user' }, { where: { id: req.params.id } })
+    .update(
+      { status: "deactivated", notes: "Deactivated by user" },
+      { where: { id: req.params.id } }
+    )
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
@@ -217,6 +222,7 @@ router.post("/report/:userId", [authToken], async (req, res) => {
 
 router.get("/reviews", [authToken], async (req, res) => {
   const Reviews = await reviews.findAll({
+    order: [["createdAt", "DESC"]],
     attributes: { exclude: ["likes", "userIds", "number", "updatedAt"] }
   });
 
@@ -320,7 +326,8 @@ router.get("/contractor/:contractorId/reviews", authToken, async (req, res) => {
     return res.status(400).send({ message: "Bad request" });
 
   const reviews = await contractorReviews.findAll({
-    where: { contractorId: req.params.contractorId }
+    where: { contractorId: req.params.contractorId },
+    order: [["createdAt", "DESC"]]
   });
 
   res.status(200).send(reviews);

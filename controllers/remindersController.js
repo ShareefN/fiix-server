@@ -97,7 +97,8 @@ router.get("/:type/:typeId", [authToken], async (req, res) => {
 
   if (req.params.type === "user") {
     const reminder = await reminders.findAll({
-      where: { userId: req.params.typeId }
+      where: { userId: req.params.typeId },
+      order: [["createdAt", "DESC"]]
     });
     res.status(200).send(reminder);
   }
