@@ -295,6 +295,21 @@ router.get("/contractors/:category", [authToken], async (req, res) => {
   res.status(200).send(list);
 });
 
+router.get(
+  "/contractors/category/:category/location/:location",
+  [authToken],
+  async (req, res) => {
+    if (!req.params.location || !req.params.category)
+      return res.status(400).send({ message: "Bad Request" });
+
+    const result = await contractors.findAll({
+      where: { category: req.params.category, location: req.params.location }
+    });
+
+    res.status(200).send(result);
+  }
+);
+
 router.get("/contractor/:contractorId", [authToken], async (req, res) => {
   if (!req.params.contractorId)
     return res.status(404).send({ message: "Bad Request" });
