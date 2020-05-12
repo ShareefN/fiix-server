@@ -303,7 +303,24 @@ router.get(
       return res.status(400).send({ message: "Bad Request" });
 
     const result = await contractors.findAll({
-      where: { category: req.params.category, location: req.params.location }
+      where: {
+        category: req.params.category,
+        location: req.params.location,
+        status: "active"
+      },
+      attributes: {
+        exclude: [
+          "password",
+          "identity",
+          "nonCriminal",
+          "notes",
+          "updatedAt",
+          "email",
+          "number",
+          "gender",
+          "createdAt"
+        ]
+      }
     });
 
     res.status(200).send(result);
