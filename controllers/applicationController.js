@@ -2,6 +2,35 @@ const express = require("express");
 const router = express.Router();
 const _ = require("lodash");
 const { contractors, users, application } = require("../models");
+const cloudinary = require("cloudinary").v2;
+const config = require("config");
+
+cloudinary.config({
+  cloud_name: config.get("cloud_name"),
+  api_key: config.get("cloud_key"),
+  api_secret: config.get("cloud_secret")
+});
+
+router.post("/uplaod/profileImage", [authToken], async (req, res) => {
+  if (!req.body.image) return res.status(400).send({ message: "Bad Request" });
+
+  const result = await cloudinary.uploader.upload(req.body.image);
+  res.status(200).send(result.url);
+});
+
+router.post("/upload/noncriminal", [authToken], async (req, res) => {
+  if (!req.body.image) return res.status(400).send({ message: "Bad Request" });
+
+  const result = await cloudinary.uploader.upload(req.body.image);
+  res.status(200).send(result.url);
+});
+
+router.post("/upload/identitiy", [authToken], async (req, res) => {
+  if (!req.body.image) return res.status(400).send({ message: "Bad Request" });
+
+  const result = await cloudinary.uploader.upload(req.body.image);
+  res.status(200).send(result.url);
+});
 
 router.post("/apply/:id", [authToken], async (req, res) => {
   const user = await users.findOne({ where: { id: req.params.id } });
@@ -14,7 +43,7 @@ router.post("/apply/:id", [authToken], async (req, res) => {
       notes: user.notes
     });
 
-  if (user.applicationStatus !== 'new')
+  if (user.applicationStatus !== "new")
     return res.status(403).send({
       message: `User already ${user.applicationStatus}`,
       status: user.status,

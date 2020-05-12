@@ -8,7 +8,6 @@ const {
   review,
   forgotPassword,
   statistics,
-  userApp,
   postman,
   reminders
 } = require("../controllers");
@@ -21,9 +20,6 @@ module.exports = app => {
   app.get("/", (req, res) => {
     res.status(200).send({ message: "Server is alive!" });
   });
-
-  // USER APP ROUTES
-  app.use("/app", userApp);
 
   // ADMIN ROUTES
   app.use("/admins", admins);

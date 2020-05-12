@@ -1,5 +1,8 @@
 {
     "jwtPrivateKey": "fiix_jwtPrivateKey",
     "db": "fiix_db",
+    "cloud_name": "cloud_name",
+    "cloud_key": "api_key",
+    "cloud_secret": "api_secret",
     "use_env_variable": "JAWSDB_URL"
 }
