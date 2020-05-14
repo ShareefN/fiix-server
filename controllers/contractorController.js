@@ -21,12 +21,10 @@ router.post("/contractor/login", async (req, res) => {
     return res.status(404).send({ message: "Invalid email or password" });
 
   if (contractor.dataValues.status !== "active")
-    return res
-      .status(400)
-      .send({
-        message: `Contractor account ${contractor.dataValues.status}`,
-        notes: contractor.dataValues.notes
-      });
+    return res.status(400).send({
+      message: `Contractor account ${contractor.dataValues.status}`,
+      notes: contractor.dataValues.notes
+    });
 
   const validatePassword = await bcrypt.compare(
     req.body.password,
@@ -37,17 +35,19 @@ router.post("/contractor/login", async (req, res) => {
     return res.status(404).send({ message: "Invalid email or password" });
 
   const token = await generateAuthToken(contractor);
+
   const Contractor = await _.pick(contractor, [
     "id",
     "name",
     "number",
-    "status"
+    "status",
+    "category"
   ]);
-
+  
   res
     .status(200)
     .header("Authorization", token)
-    .send({ message: "success", nextStep: "dashboard", Contractor, token });
+    .send({ message: "success", Contractor, token });
 });
 
 router.get("/contractor/:id", [authToken], async (req, res) => {
