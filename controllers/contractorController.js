@@ -146,11 +146,22 @@ router.get(
 
     const reviews = await contractorReviews.findAll({
       where: { contractorId: req.params.contractorId },
+      order: [["createdAt", "DESC"]],
       attributes: { exclude: ["userId", "id", "updatedAt", "contractorId"] }
     });
 
     res.status(200).send(reviews);
   }
 );
+
+router.put("/contractor/:contractorId/bio", [authToken], async (req, res) => {
+  if (!req.params.contractorId || !req.body.bio)
+    return res.status(400).send({ message: "Bad Request" });
+
+  await contractors
+    .update({ bio: req.body.bio }, { where: { id: req.params.contractorId } })
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err }));
+});
 
 module.exports = router;
