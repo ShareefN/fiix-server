@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const authToken = require("../middleware/authenticate");
 const _ = require("lodash");
-const { contractors } = require("../models");
+const { contractors, contractorReviews } = require("../models");
 
 generateAuthToken = admin => {
   const token = jwt.sign({ admin }, config.get("jwtPrivateKey"));
@@ -43,7 +43,7 @@ router.post("/contractor/login", async (req, res) => {
     "status",
     "category"
   ]);
-  
+
   res
     .status(200)
     .header("Authorization", token)
@@ -59,20 +59,20 @@ router.get("/contractor/:id", [authToken], async (req, res) => {
     return res.status(404).send({ message: "Contractor not found" });
 
   const result = await _.pick(contractor, [
-    "id",
     "name",
     "email",
     "number",
-    "hasApplied",
-    "isRejected",
-    "isProhibited",
-    "isDeactivated",
-    "rejectedReason",
-    "prohibitedReason",
     "createdAt",
     "updatedAt",
     "status",
-    "notes"
+    "notes",
+    "bio",
+    "location",
+    "timeIn",
+    "timeOut",
+    "profileImage",
+    "identity",
+    "nonCriminal"
   ]);
 
   res.status(200).send(result);
@@ -136,5 +136,21 @@ router.put("/deactivate/contractor/:id", [authToken], async (req, res) => {
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
+
+router.get(
+  "/contractor/:contractorId/reviews",
+  [authToken],
+  async (req, res) => {
+    if (!req.params.contractorId)
+      return res.status(400).send({ message: "Bad Request" });
+
+    const reviews = await contractorReviews.findAll({
+      where: { contractorId: req.params.contractorId },
+      attributes: { exclude: ["userId", "id", "updatedAt", "contractorId"] }
+    });
+
+    res.status(200).send(reviews);
+  }
+);
 
 module.exports = router;
