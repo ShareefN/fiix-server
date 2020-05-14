@@ -185,7 +185,11 @@ router.get("/:category/:contractorId", [authToken], async (req, res) => {
         "email",
         "number",
         "gender",
-        "createdAt"
+        "createdAt",
+        "status",
+        "bio",
+        "category",
+        "rating",
       ]
     }
   });
