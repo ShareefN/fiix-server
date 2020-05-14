@@ -6,6 +6,7 @@ const config = require("config");
 const authToken = require("../middleware/authenticate");
 const _ = require("lodash");
 const { contractors, contractorReviews } = require("../models");
+const { Op } = require("sequelize");
 
 generateAuthToken = admin => {
   const token = jwt.sign({ admin }, config.get("jwtPrivateKey"));
@@ -162,6 +163,59 @@ router.put("/contractor/:contractorId/bio", [authToken], async (req, res) => {
     .update({ bio: req.body.bio }, { where: { id: req.params.contractorId } })
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err }));
+});
+
+router.get("/:category/:contractorId", [authToken], async (req, res) => {
+  if (!req.params.category || !req.params.contractorId)
+    return res.status(400).send({ message: "Bad Request" });
+
+  const category = await contractors.findAll({
+    where: {
+      category: req.params.category,
+      status: "active",
+      [Op.not]: [{ id: req.params.contractorId }]
+    },
+    attributes: {
+      exclude: [
+        "password",
+        "identity",
+        "nonCriminal",
+        "notes",
+        "updatedAt",
+        "email",
+        "number",
+        "gender",
+        "createdAt"
+      ]
+    }
+  });
+  res.status(200).send(category);
+});
+
+router.get("/:contractorId", [authToken], async (req, res) => {
+  if (!req.params.contractorId)
+    return res.status(400).send({ message: "Bad Request" });
+    
+  const contractor = await contractors.findAll({
+    where: { id: req.params.contractorId },
+    attributes: {
+      exclude: [
+        "password",
+        "identity",
+        "nonCriminal",
+        "notes",
+        "updatedAt",
+        "email",
+        "number",
+        "gender",
+        "createdAt"
+      ]
+    }
+  });
+
+  if(!contractor) return res.status(400).send({message: 'Not Found'})
+
+  res.status(200).send(contractor);
 });
 
 module.exports = router;
