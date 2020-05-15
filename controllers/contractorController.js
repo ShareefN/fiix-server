@@ -189,18 +189,19 @@ router.get("/:category/:contractorId", [authToken], async (req, res) => {
         "status",
         "bio",
         "category",
-        "rating",
+        "rating"
       ]
     }
   });
+
   res.status(200).send(category);
 });
 
 router.get("/:contractorId", [authToken], async (req, res) => {
   if (!req.params.contractorId)
     return res.status(400).send({ message: "Bad Request" });
-    
-  const contractor = await contractors.findAll({
+
+  const contractor = await contractors.findOne({
     where: { id: req.params.contractorId },
     attributes: {
       exclude: [
@@ -217,7 +218,7 @@ router.get("/:contractorId", [authToken], async (req, res) => {
     }
   });
 
-  if(!contractor) return res.status(400).send({message: 'Not Found'})
+  if (!contractor) return res.status(400).send({ message: "Not Found" });
 
   res.status(200).send(contractor);
 });
