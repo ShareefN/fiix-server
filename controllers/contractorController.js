@@ -145,7 +145,7 @@ router.put("/deactivate/contractor/:id", [authToken], async (req, res) => {
       .send({ message: `Contractor account ${isFound.dataValues.status}` });
 
   await contractors
-    .update({ status: "deactivated" }, { where: { id: req.params.id } })
+    .update({ status: "deactivated", notes: 'Deactivated by user' }, { where: { id: req.params.id } })
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
