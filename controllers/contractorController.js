@@ -80,6 +80,8 @@ router.get("/contractor/:id", [authToken], async (req, res) => {
 });
 
 router.put("/contractor/update/password/:id", [authToken], async (req, res) => {
+  if (!req.params.id) return res.status(400).send({ message: "Bad Request" });
+
   const contractor = await contractors.findOne({
     where: { id: req.params.id }
   });
@@ -109,6 +111,9 @@ router.put("/contractor/update/password/:id", [authToken], async (req, res) => {
 });
 
 router.put("/update/contractor/:id", [authToken], async (req, res) => {
+  if (!req.body.password)
+    return res.status(400).send({ message: "Bad request" });
+
   const contractor = await contractors.findOne({
     where: { id: req.params.id }
   });
@@ -126,6 +131,13 @@ router.put("/deactivate/contractor/:id", [authToken], async (req, res) => {
   const isFound = await contractors.findOne({ where: { id: req.params.id } });
   if (!isFound)
     return res.status(404).send({ message: "contractor not found" });
+
+  const validatePassword = await bcrypt.compare(
+    req.body.password,
+    isFound.password
+  );
+  if (!validatePassword)
+    return res.status(400).send({ message: "Password is invalid" });
 
   if (isFound.dataValues.status !== "active")
     return res
@@ -154,16 +166,6 @@ router.get(
     res.status(200).send(reviews);
   }
 );
-
-router.put("/contractor/:contractorId/bio", [authToken], async (req, res) => {
-  if (!req.params.contractorId || !req.body.bio)
-    return res.status(400).send({ message: "Bad Request" });
-
-  await contractors
-    .update({ bio: req.body.bio }, { where: { id: req.params.contractorId } })
-    .then(() => res.status(200).send({ message: "success" }))
-    .catch(err => res.status(500).send({ error: err }));
-});
 
 router.get("/:category/:contractorId", [authToken], async (req, res) => {
   if (!req.params.category || !req.params.contractorId)

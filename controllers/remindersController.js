@@ -105,7 +105,8 @@ router.get("/:type/:typeId", [authToken], async (req, res) => {
 
   if (req.params.type === "contractor") {
     const reminder = await reminders.findAll({
-      where: { contractorId: req.params.typeId }
+      where: { contractorId: req.params.typeId },
+      order: [["createdAt", "DESC"]]
     });
     res.status(200).send(reminder);
   }
