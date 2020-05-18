@@ -6,6 +6,7 @@ const db = require("./models");
 var cors = require("cors");
 const http = require("http");
 const bodyParser = require("body-parser");
+const formData = require("express-form-data");
 
 const app = express();
 
@@ -25,10 +26,13 @@ if (!config.get("jwtPrivateKey")) {
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(formData.parse());
 
 app.use(function(req, res, next) {
   res.header("Content-Type: application/json");
-  res.header("Access-Control-Allow-Origin: https://fiix-dashboard-app.herokuapp.com/");
+  res.header(
+    "Access-Control-Allow-Origin: https://fiix-dashboard-app.herokuapp.com/"
+  );
   next();
 });
 
