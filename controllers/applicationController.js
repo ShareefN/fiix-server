@@ -12,16 +12,10 @@ cloudinary.config({
 });
 
 router.post("/uplaod/profileImage", async (req, res) => {
-  // if (!req.body.image) return res.status(400).send({ message: "Bad Request" });
+  if (!req.body.image) return res.status(400).send({ message: "Bad Request" });
 
-  let imageCloud = await cloudinary.v2.uploader.upload(req.files.file.path, {
-    use_filename: true
-  });
-
-  res.status(200).send(imageCloud);
-
-  // const result = await cloudinary.uploader.upload(req.body.image);
-  // res.status(200).send(result.url);
+  const result = await cloudinary.uploader.upload(req.body.image);
+  res.status(200).send({ url: result.url });
 });
 
 router.post("/upload/noncriminal", [authToken], async (req, res) => {
