@@ -671,8 +671,8 @@ router.put(
 );
 
 router.get("/reports", [authToken], async (req, res) => {
-  const Reports = await reports.findAll({order: [["createdAt", "DESC"]]});
-  res.status(200).send(Reports);
+  const result = await reports.findAll({order: [["createdAt", "DESC"]]});
+  res.status(200).send(result);
 });
 
 router.get("/report/:reportId", [authToken], async (req, res) => {

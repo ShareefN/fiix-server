@@ -4,7 +4,6 @@ const {
   admins,
   application,
   contractors,
-  categories,
   review,
   forgotPassword,
   statistics,
@@ -32,9 +31,6 @@ module.exports = app => {
 
   // CONTRACTORS ROUTES
   app.use("/contractors", contractors);
-
-  // CATEGORIES ROUTES
-  app.use("/categories", categories);
 
   // REVIEWS ROUTES
   app.use("/reviews", review);

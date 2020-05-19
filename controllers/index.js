@@ -2,7 +2,6 @@ const users = require('./userController');
 const contractors = require("./contractorController");
 const application = require('./applicationController');
 const admins = require('./adminController');
-const categories = require('./categoryController');
 const review = require('./reviewController');
 const forgotPassword = require('./forgotPassword');
 const statistics = require('./statsController');
@@ -14,7 +13,6 @@ module.exports = {
   contractors,
   application,
   admins,
-  categories,
   review,
   forgotPassword,
   statistics,

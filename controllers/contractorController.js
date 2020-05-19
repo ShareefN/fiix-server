@@ -145,7 +145,10 @@ router.put("/deactivate/contractor/:id", [authToken], async (req, res) => {
       .send({ message: `Contractor account ${isFound.dataValues.status}` });
 
   await contractors
-    .update({ status: "deactivated", notes: 'Deactivated by user' }, { where: { id: req.params.id } })
+    .update(
+      { status: "deactivated", notes: "Deactivated by user" },
+      { where: { id: req.params.id } }
+    )
     .then(() => res.status(200).send({ message: "success" }))
     .catch(err => res.status(500).send({ error: err.message }));
 });
@@ -166,6 +169,25 @@ router.get(
     res.status(200).send(reviews);
   }
 );
+
+router.post("/report/:contractorId", [authToken], async (req, res) => {
+  if (!req.body.report) return res.status(404).send({ message: "Bad Request" });
+
+  const contractor = await contractors.findOne({ where: { id: req.params.contractorId } });
+  if (!contractor) return res.status(404).send({ message: "Not found" });
+
+  const report = {
+    contractorId: contractor.id,
+    name: contractor.name,
+    number: contractor.number,
+    report: req.body.report
+  };
+
+  await reports
+    .create(report)
+    .then(() => res.status(200).send({ message: "success" }))
+    .catch(err => res.status(500).send({ error: err.messgae }));
+});
 
 router.get("/:category/:contractorId", [authToken], async (req, res) => {
   if (!req.params.category || !req.params.contractorId)

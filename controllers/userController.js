@@ -209,7 +209,7 @@ router.post("/report/:userId", [authToken], async (req, res) => {
 
   const report = {
     userId: user.id,
-    username: user.username,
+    name: user.username,
     number: user.number,
     report: req.body.report
   };
