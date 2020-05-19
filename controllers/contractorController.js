@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const authToken = require("../middleware/authenticate");
 const _ = require("lodash");
-const { contractors, contractorReviews } = require("../models");
+const { contractors, contractorReviews, reports } = require("../models");
 const { Op } = require("sequelize");
 
 generateAuthToken = admin => {
@@ -175,7 +175,7 @@ router.post("/report/:contractorId", [authToken], async (req, res) => {
 
   const contractor = await contractors.findOne({ where: { id: req.params.contractorId } });
   if (!contractor) return res.status(404).send({ message: "Not found" });
-
+  console.log(contractor.id)
   const report = {
     contractorId: contractor.id,
     name: contractor.name,
