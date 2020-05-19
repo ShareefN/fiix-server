@@ -6,6 +6,7 @@ const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 router.post("/forgotpassword", async (req, res) => {
+  console.log(process.env.SENDGRID_API_KEY)
   const msg = {
     to: "shareefnuseibeh1@yahoo.com",
     from: "fiixcareers@gmail.com",
