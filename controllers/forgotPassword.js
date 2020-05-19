@@ -3,7 +3,7 @@ const router = express.Router();
 // const { users } = require("../models");
 const sgMail = require("@sendgrid/mail");
 
-sgMail.setApiKey('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');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 router.post("/forgotpassword", async (req, res) => {
   const msg = {
