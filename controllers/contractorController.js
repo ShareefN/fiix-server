@@ -111,7 +111,7 @@ router.put("/contractor/update/password/:id", [authToken], async (req, res) => {
 });
 
 router.put("/update/contractor/:id", [authToken], async (req, res) => {
-  if (!req.body.password)
+  if (!req.body)
     return res.status(400).send({ message: "Bad request" });
 
   const contractor = await contractors.findOne({
